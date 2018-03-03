@@ -1,0 +1,40 @@
+#!/bin/bash
+#SBATCH -N 1
+#SBATCH -p GPU-shared
+#SBATCH --ntasks-per-node 2
+#SBATCH --gres=gpu:k80:1
+#SBATCH -t 36:00:00
+
+# this will request 2 CPU cores, an one k80 on a shared GPU node
+# if the job is still running after 10 hours, it will be automatically killed.
+
+set -x  # echo commands to stdout
+set -u  # throw an error if unset variable referenced
+set -e  # exit on error
+
+module load cuda/8.0
+module load python3
+# Needed for Monitor to record videos.
+module load ffmpeg
+
+PYLON5=/pylon5/$(id -gn)/$USER
+rl_src="${PYLON5}/10-703/2/src"
+
+# NOTE: Files in this directory are deleted when 30 days old
+pushd $PYLON5
+
+# turn on the virtualenv
+set +u
+source "${rl_src}/deeprl_hw2/bin/activate"
+set -u
+
+# run the experiment script
+python "${rl_src}/dqn_atari.py" --env SpaceInvadersDeterministic-v3
+
+# turn off the virtualenv
+set +u
+deactivate
+set -u
+
+# go back to the original dir
+popd
