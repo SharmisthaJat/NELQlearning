@@ -1,0 +1,63 @@
+!_TAG_FILE_SORTED	2	/0=unsorted, 1=sorted, 2=foldcase/
+a	/home/darshan/rl/dtc/dqn.py	/^a = Variable(torch.Tensor([1,2,3]))$/;"	v	language:Python
+add	/home/darshan/rl/dtc/dqn.py	/^    def add(self, s1, s2, action, reward, done):$/;"	m	language:Python	class:Replay
+add_to_replay	/home/darshan/rl/dtc/dqn.py	/^def add_to_replay(eps, game, dqn, frames, actions, replay):$/;"	f	language:Python
+batch_size	/home/darshan/rl/dtc/dqn.py	/^batch_size = 32$/;"	v	language:Python
+batch_size	/home/darshan/rl/dtc/watch_dqn.py	/^batch_size = 32$/;"	v	language:Python
+config_file_path	/home/darshan/rl/dtc/dqn.py	/^config_file_path = '.\/defend_the_center.cfg'$/;"	v	language:Python
+config_file_path	/home/darshan/rl/dtc/watch_dqn.py	/^config_file_path = '.\/defend_the_center.cfg'$/;"	v	language:Python
+create_state	/home/darshan/rl/dtc/dqn.py	/^def create_state(cur_frame, frames, replace=True):$/;"	f	language:Python
+create_state	/home/darshan/rl/dtc/watch_dqn.py	/^def create_state(cur_frame, frames, replace=True):$/;"	f	language:Python
+curIndex	/home/darshan/rl/dtc/dqn.py	/^    curIndex = 0$/;"	v	language:Python	class:Replay
+discount_factor	/home/darshan/rl/dtc/dqn.py	/^discount_factor = 0.99$/;"	v	language:Python
+discount_factor	/home/darshan/rl/dtc/watch_dqn.py	/^discount_factor = 0.99$/;"	v	language:Python
+DQN	/home/darshan/rl/dtc/dqn.py	/^class DQN(nn.Module):$/;"	c	language:Python
+DQN	/home/darshan/rl/dtc/watch_dqn.py	/^class DQN(nn.Module):$/;"	c	language:Python
+episodes_to_watch	/home/darshan/rl/dtc/dqn.py	/^episodes_to_watch = 10$/;"	v	language:Python
+episodes_to_watch	/home/darshan/rl/dtc/watch_dqn.py	/^episodes_to_watch = 10$/;"	v	language:Python
+epochs	/home/darshan/rl/dtc/dqn.py	/^epochs = 20$/;"	v	language:Python
+epochs	/home/darshan/rl/dtc/watch_dqn.py	/^epochs = 20$/;"	v	language:Python
+forward	/home/darshan/rl/dtc/dqn.py	/^    def forward(self, x):$/;"	m	language:Python	class:DQN
+forward	/home/darshan/rl/dtc/watch_dqn.py	/^    def forward(self, x):$/;"	m	language:Python	class:DQN
+frame_repeat	/home/darshan/rl/dtc/dqn.py	/^frame_repeat = 4$/;"	v	language:Python
+frame_repeat	/home/darshan/rl/dtc/watch_dqn.py	/^frame_repeat = 4$/;"	v	language:Python
+get_action	/home/darshan/rl/dtc/dqn.py	/^def get_action(input, dqn):$/;"	f	language:Python
+get_action	/home/darshan/rl/dtc/watch_dqn.py	/^def get_action(input, dqn):$/;"	f	language:Python
+get_current_vars	/home/darshan/rl/dtc/dqn.py	/^def get_current_vars(game):$/;"	f	language:Python
+get_current_vars	/home/darshan/rl/dtc/watch_dqn.py	/^def get_current_vars(game):$/;"	f	language:Python
+get_q	/home/darshan/rl/dtc/dqn.py	/^def get_q(input, dqn):$/;"	f	language:Python
+get_q	/home/darshan/rl/dtc/watch_dqn.py	/^def get_q(input, dqn):$/;"	f	language:Python
+initialize_vizdoom	/home/darshan/rl/dtc/dqn.py	/^def initialize_vizdoom(config_file_path):$/;"	f	language:Python
+initialize_vizdoom	/home/darshan/rl/dtc/watch_dqn.py	/^def initialize_vizdoom(config_file_path):$/;"	f	language:Python
+learn	/home/darshan/rl/dtc/dqn.py	/^def learn(game, dqn, target_dqn, frames, actions, replay, batch_size, optimizer):$/;"	f	language:Python
+learning_rate	/home/darshan/rl/dtc/dqn.py	/^learning_rate = 0.00025$/;"	v	language:Python
+learning_rate	/home/darshan/rl/dtc/watch_dqn.py	/^learning_rate = 0.00025$/;"	v	language:Python
+learning_steps_per_epoch	/home/darshan/rl/dtc/dqn.py	/^learning_steps_per_epoch = 2000$/;"	v	language:Python
+learning_steps_per_epoch	/home/darshan/rl/dtc/watch_dqn.py	/^learning_steps_per_epoch = 2000$/;"	v	language:Python
+main	/home/darshan/rl/dtc/dqn.py	/^def main():$/;"	f	language:Python
+main	/home/darshan/rl/dtc/watch_dqn.py	/^def main():$/;"	f	language:Python
+model_savefile	/home/darshan/rl/dtc/dqn.py	/^model_savefile = ".\/weights.dump"$/;"	v	language:Python
+model_savefile	/home/darshan/rl/dtc/watch_dqn.py	/^model_savefile = ".\/weights.dump"$/;"	v	language:Python
+num_flat_features	/home/darshan/rl/dtc/dqn.py	/^    def num_flat_features(self, x):$/;"	m	language:Python	class:DQN
+num_flat_features	/home/darshan/rl/dtc/watch_dqn.py	/^    def num_flat_features(self, x):$/;"	m	language:Python	class:DQN
+preprocess	/home/darshan/rl/dtc/dqn.py	/^def preprocess(image):$/;"	f	language:Python
+preprocess	/home/darshan/rl/dtc/watch_dqn.py	/^def preprocess(image):$/;"	f	language:Python
+Replay	/home/darshan/rl/dtc/dqn.py	/^class Replay:$/;"	c	language:Python
+replay_memory_size	/home/darshan/rl/dtc/dqn.py	/^replay_memory_size = 10000$/;"	v	language:Python
+replay_memory_size	/home/darshan/rl/dtc/watch_dqn.py	/^replay_memory_size = 10000$/;"	v	language:Python
+resolution	/home/darshan/rl/dtc/dqn.py	/^resolution = (60, 80)$/;"	v	language:Python
+resolution	/home/darshan/rl/dtc/watch_dqn.py	/^resolution = (60, 80)$/;"	v	language:Python
+sample	/home/darshan/rl/dtc/dqn.py	/^    def sample(self, batch_size):$/;"	m	language:Python	class:Replay
+size	/home/darshan/rl/dtc/dqn.py	/^    size = 0$/;"	v	language:Python	class:Replay
+stack_size	/home/darshan/rl/dtc/dqn.py	/^stack_size=4$/;"	v	language:Python
+stack_size	/home/darshan/rl/dtc/watch_dqn.py	/^stack_size=4$/;"	v	language:Python
+test	/home/darshan/rl/dtc/dqn.py	/^def test(game, dqn, actions, visualize=False):$/;"	f	language:Python
+test	/home/darshan/rl/dtc/watch_dqn.py	/^def test(game, dqn, actions, visualize=False):$/;"	f	language:Python
+test_episodes_per_epoch	/home/darshan/rl/dtc/dqn.py	/^test_episodes_per_epoch = 100$/;"	v	language:Python
+test_episodes_per_epoch	/home/darshan/rl/dtc/watch_dqn.py	/^test_episodes_per_epoch = 100$/;"	v	language:Python
+train	/home/darshan/rl/dtc/dqn.py	/^def train(game, dqn, target_dqn, actions, replay, optimizer, num_episodes=0, training_step=0):$/;"	f	language:Python
+update_frequency	/home/darshan/rl/dtc/dqn.py	/^update_frequency=4$/;"	v	language:Python
+update_frequency	/home/darshan/rl/dtc/watch_dqn.py	/^update_frequency=4$/;"	v	language:Python
+__init__	/home/darshan/rl/dtc/dqn.py	/^    def __init__(self, actions):$/;"	m	language:Python	class:DQN
+__init__	/home/darshan/rl/dtc/dqn.py	/^    def __init__(self, capacity):$/;"	m	language:Python	class:Replay
+__init__	/home/darshan/rl/dtc/watch_dqn.py	/^    def __init__(self, actions):$/;"	m	language:Python	class:DQN
