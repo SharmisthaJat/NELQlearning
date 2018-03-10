@@ -5,7 +5,7 @@ import nel
 
 class Environment():
 	def __init__(self,config):
-		simulator = nel.Simulator(sim_config=config)
+		self.simulator = nel.Simulator(sim_config=config)
  
 	def reward(self):
 		return 0
