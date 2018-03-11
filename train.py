@@ -1,6 +1,6 @@
 from agent import RLAgent
 from environment import Environment
-from config import config1
+from config import config2
 
 from collections import deque
 import random
@@ -76,7 +76,7 @@ def train(agent, env, actions, optimizer):
     training_steps += 1
 
 def main():
-  env = Environment(config1)
+  env = Environment(config2)
   agent = RLAgent(env)
   optimizer = optim.SGD(agent.policy.parameters(), lr=.1)
   train(agent, env, [0,1,2,3], optimizer)
