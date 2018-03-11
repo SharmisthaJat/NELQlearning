@@ -23,32 +23,39 @@ class Policy(nn.Module):
     x = F.relu(self.fc1(x))
     x = F.relu(self.fc2(x))
     return self.fc3(x)
-    
-    
 
 class RLAgent(nel.Agent):
   def __init__(self, env, history=3, load_filepath=None):
     super(RLAgent, self).__init__(env.simulator, load_filepath)
     self.env = env
     self.policy = Policy()
-    self.prev_states = deque(maxlen=history + 1)
+    self.target = Policy()
+
+    for param in self.target.parameters():
+      param.requires_grad = False
+    # Should we have a function over the history?
+    self.prev_states = deque(maxlen=history)
     self.history = history
 
   def next_move(self):
-    state = self.get_state()
-    self.prev_states.append(state)
-    if(len(self.prev_states) < self.history + 1):
+    if(len(self.prev_states) < self.history):
       return actions[np.random.randint(0, len(actions))]
 
-    context = Variable(torch.from_numpy(np.concatenate(self.prev_states)))
+    state = self.get_state()
+    context = Variable(torch.from_numpy(state), requires_grad=False)
+    self.prev_states.append(self.create_current_frame())
     qs = self.policy(context)
     ind = np.argmax(qs.data.numpy())
     return actions[ind]
     
-  def get_state(self):
+  def create_current_frame(self):
     vis = self.vision().flatten()
     smell = self.scent()
     return np.concatenate([vis, smell])
+
+  def get_state(self):
+    context = np.concatenate([self.prev_states])
+    return np.concatenate([context, self.create_current_frame()])
 
   def save(self, filepath):
     pass
