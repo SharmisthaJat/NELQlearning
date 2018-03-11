@@ -39,6 +39,7 @@ class RLAgent(nel.Agent):
 
   def next_move(self):
     if(len(self.prev_states) < self.history):
+      self.prev_states.append(self.create_current_frame())
       return actions[np.random.randint(0, len(actions))]
 
     state = self.get_state()
@@ -54,7 +55,10 @@ class RLAgent(nel.Agent):
     return np.concatenate([vis, smell])
 
   def get_state(self):
-    context = np.concatenate([self.prev_states])
+    if len(self.prev_states) > 0:
+      context = np.concatenate(self.prev_states)
+    else:
+      context = np.array([])
     return np.concatenate([context, self.create_current_frame()])
 
   def save(self, filepath):

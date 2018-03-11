@@ -37,13 +37,13 @@ def train(agent, env, actions, optimizer):
     else:
       epsilon = EPS_START - (EPS_START - EPS_END) * (training_steps - EPS_DECAY_START) / (EPS_DECAY_END - EPS_DECAY_START)
 
+    add_to_replay = len(agent.prev_states) == 3
     s1 = agent.get_state()
-    print agent.prev_states
-    print s1.shape
     action, reward = env.step(agent)
     s2 = agent.get_state()
-    print s2.shape
-    replay.append((s1, action, reward, s2))
+    if add_to_replay:
+      replay.append((s1, action.value, reward, s2))
+
     if training_steps % update_frequency == 0:
       if batch_size < len(replay):
         sample = random.sample(replay, batch_size)
@@ -63,15 +63,16 @@ def train(agent, env, actions, optimizer):
         reward = torch.FloatTensor(reward)
         y = Variable(reward + (discount_factor * q2))
 
-        huber = nn.SmoothL1Loss()
-        loss = huber(q1, y)
+        #huber = nn.SmoothL1Loss()
+        mse = nn.MSELoss()
+        loss = mse(q1, y)
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
 
         if training_steps % target_update_frequency == 0:
           agent.target.load_state_dict(agent.policy.state_dict())
-          print(loss)
+          print(loss.data[0])
 
     training_steps += 1
 
