@@ -29,7 +29,7 @@ def train(agent, env, actions, optimizer,agent_eval):
   replay = deque(maxlen=10000)
   discount_factor = .9
   eval_reward = []
-  eval_steps = 100
+  eval_steps = 10
   max_epoch = 10
   for i in range(max_epoch):
     if training_steps < EPS_DECAY_START:
@@ -82,6 +82,7 @@ def train(agent, env, actions, optimizer,agent_eval):
             s1 = agent_eval.get_state()
             action, reward = env.step(agent_eval)
             eval_reward.append(reward)  
+            print 'eval reward', reward
 
 
     training_steps += 1
