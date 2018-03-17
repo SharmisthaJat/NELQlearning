@@ -14,7 +14,7 @@ import torchvision.transforms as T
 
 import numpy as np
 
-def train(agent, env, actions, optimizer):
+def train(agent, env, actions, optimizer,agent_eval):
   EPS_START = 1.
   EPS_END = .1
   EPS_DECAY_START=1000.
@@ -22,14 +22,16 @@ def train(agent, env, actions, optimizer):
 
   update_frequency = 4
   target_update_frequency = 1000
+  eval_frequency = 1000
   batch_size = 16
   training_steps = 0
   epsilon = 1.
   replay = deque(maxlen=10000)
   discount_factor = .9
-
-
-  while(True):
+  eval_reward = []
+  eval_steps = 100
+  max_epoch = 10
+  for i in range(max_epoch):
     if training_steps < EPS_DECAY_START:
       epsilon = EPS_START
     elif training_steps > EPS_DECAY_END:
@@ -74,13 +76,22 @@ def train(agent, env, actions, optimizer):
           agent.target.load_state_dict(agent.policy.state_dict())
           print(loss.data[0])
 
+        if training_steps % eval_frequency == 0:
+          for i in range(eval_steps):
+            agent_eval.load_state_dict(agent.state_dict())
+            s1 = agent_eval.get_state()
+            action, reward = env.step(agent_eval)
+            eval_reward.append(reward)  
+
+
     training_steps += 1
 
 def main():
   env = Environment(config2)
   agent = RLAgent(env)
+  agent_eval = RLAgent(env)
   optimizer = optim.SGD(agent.policy.parameters(), lr=.1)
-  train(agent, env, [0,1,2,3], optimizer)
+  train(agent, env, [0,1,2,3], optimizer,agent_eval)
 
 if __name__ == '__main__':
   main()
