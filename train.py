@@ -30,7 +30,7 @@ def train(agent, env, actions, optimizer,agent_eval):
   discount_factor = .9
   eval_reward = []
   eval_steps = 10
-  max_epoch = 10
+  max_epoch = 100000
   for i in range(max_epoch):
     if training_steps < EPS_DECAY_START:
       epsilon = EPS_START
@@ -44,7 +44,8 @@ def train(agent, env, actions, optimizer,agent_eval):
     action, reward = env.step(agent)
     s2 = agent.get_state()
     if add_to_replay:
-      replay.append((s1, action.value, reward, s2))
+      #replay.append((s1, action.value, reward, s2))  # enum issue in server machine
+      replay.append((s1, action, reward, s2))
 
     if training_steps % update_frequency == 0:
       if batch_size < len(replay):
@@ -78,7 +79,7 @@ def train(agent, env, actions, optimizer,agent_eval):
 
         if training_steps % eval_frequency == 0:
           for i in range(eval_steps):
-            agent_eval.load_state_dict(agent.state_dict())
+            agent_eval.target.load_state_dict(agent.target.state_dict())
             s1 = agent_eval.get_state()
             action, reward = env.step(agent_eval)
             eval_reward.append(reward)  
