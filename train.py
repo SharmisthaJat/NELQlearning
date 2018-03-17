@@ -90,7 +90,8 @@ def train(agent, env, actions, optimizer,agent_eval):
 def main():
   env = Environment(config2)
   agent = RLAgent(env)
-  agent_eval = RLAgent(env)
+  env_eval = Environment(config2)
+  agent_eval = RLAgent(env_eval)
   optimizer = optim.SGD(agent.policy.parameters(), lr=.1)
   train(agent, env, [0,1,2,3], optimizer,agent_eval)
 
