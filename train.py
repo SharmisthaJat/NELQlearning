@@ -29,8 +29,9 @@ def train(agent, env, actions, optimizer,agent_eval):
   replay = deque(maxlen=10000)
   discount_factor = .9
   eval_reward = []
-  eval_steps = 10
+  eval_steps = 1000
   max_epoch = 100000
+  cumulative_reward
   for i in range(max_epoch):
     if training_steps < EPS_DECAY_START:
       epsilon = EPS_START
@@ -74,12 +75,12 @@ def train(agent, env, actions, optimizer,agent_eval):
         optimizer.step()
 
         if training_steps % target_update_frequency == 0:
-          agent.policy.load_state_dict(agent.policy.state_dict())
+          agent.target.load_state_dict(agent.policy.state_dict())
           print(loss.data[0])
 
         if training_steps % eval_frequency == 0:
           for i in range(eval_steps):
-            agent_eval.target.load_state_dict(agent.target.state_dict())
+            agent_eval.policy.load_state_dict(agent.policy.state_dict())
             s1 = agent_eval.get_state()
             action, reward = env.step(agent_eval)
             eval_reward.append(reward)  
