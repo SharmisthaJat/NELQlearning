@@ -74,7 +74,7 @@ def train(agent, env, actions, optimizer,agent_eval):
         optimizer.step()
 
         if training_steps % target_update_frequency == 0:
-          agent.target.load_state_dict(agent.policy.state_dict())
+          agent.policy.load_state_dict(agent.policy.state_dict())
           print(loss.data[0])
 
         if training_steps % eval_frequency == 0:
