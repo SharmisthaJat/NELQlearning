@@ -88,12 +88,12 @@ def train(agent, env, actions, optimizer):
             s1 = agent_eval.get_state()
             action, reward = agent_eval.step()
             curr_reward+=reward
+
           eval_reward.append(curr_reward)           
 
-    
-
   cPickle.dump(eval_reward,open('outputs/eval_reward.pkl','w'))
-  plot_reward(eval_reward,'RL_agent_eval')
+  print eval_reward
+  #plot_reward(eval_reward,'RL_agent_eval')
     
 
 # cumulative reward for training and test 

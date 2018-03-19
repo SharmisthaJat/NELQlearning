@@ -26,10 +26,11 @@ def train(agent, env, actions, optimizer):
             action, reward = agent.step()
             curr_reward+=reward
           eval_reward.append(curr_reward)           
-
+          
     
 
   cPickle.dump(eval_reward,open('outputs/eval_random_reward.pkl','w'))
+  print eval_reward
   #plot_reward(eval_reward)
     
 
