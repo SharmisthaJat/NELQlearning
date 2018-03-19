@@ -65,7 +65,7 @@ class RLAgent(nel.Agent):
     return np.concatenate([context, self.create_current_frame()])
 
   def step(self, epsilon=0.0):
-    return self.env.step(epsilon)
+    return self.env.step(self,epsilon)
 
   def save(self, filepath):
     pass
@@ -82,7 +82,7 @@ class RandomAgent(nel.Agent):
     return actions[np.random.randint(0, len(actions))]
 
   def step(self):
-    return self.env.step()
+    return self.env.step(self)
 
 if __name__ == '__main__':
   from config import *
