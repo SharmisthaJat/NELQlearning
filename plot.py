@@ -1,4 +1,4 @@
-import matplotlib.pyplot as plt
+import matplotlib.pylab as plt
 
 def plot_reward(rewards):
 	fig,ax = plt.subplots()
