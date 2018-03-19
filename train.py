@@ -31,8 +31,8 @@ def train(agent, env, actions, optimizer, agent_eval, env_eval):
   replay = deque(maxlen=10000)
   discount_factor = .9
   eval_reward = []
-  eval_steps = 1000
-  max_epoch = 100000
+  eval_steps = 10000
+  max_epoch = 100000000
   for i in range(max_epoch):
     if training_steps < EPS_DECAY_START:
       epsilon = EPS_START
