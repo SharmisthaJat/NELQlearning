@@ -75,15 +75,20 @@ class RLAgent(nel.Agent):
 
 class RandomAgent(nel.Agent):
   def __init__(self, env, history=3, load_filepath=None):
-    super(RLAgent, self).__init__(env.simulator, load_filepath)
+    super(RandomAgent, self).__init__(env.simulator, load_filepath)
     self.env = env
   
-  def next_move(self):
+  def next_move(self,epsilon=0.0):
     return actions[np.random.randint(0, len(actions))]
 
   def step(self):
     return self.env.step(self)
+ 
+  def save(self, filepath):
+    pass
 
+  def _load(self, filepath):
+    pass
 if __name__ == '__main__':
   from config import *
   env0 = env.Environment(config1)

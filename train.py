@@ -32,7 +32,7 @@ def train(agent, env, actions, optimizer):
   discount_factor = .9
   eval_reward = []
   eval_steps = 2000
-  max_steps = 1000000
+  max_steps = 100000
   for training_steps in range(max_steps):
     if training_steps < EPS_DECAY_START:
       epsilon = EPS_START
@@ -93,7 +93,7 @@ def train(agent, env, actions, optimizer):
     
 
   cPickle.dump(eval_reward,open('outputs/eval_reward.pkl','w'))
-  plot_reward(eval_reward)
+  plot_reward(eval_reward,'RL_agent_eval')
     
 
 # cumulative reward for training and test 
