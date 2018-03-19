@@ -14,7 +14,7 @@ import torchvision.transforms as T
 
 import numpy as np
 
-def train(agent, env, actions, optimizer,agent_eval):
+def train(agent, env, actions, optimizer, agent_eval, env_eval):
   EPS_START = 1.
   EPS_END = .1
   EPS_DECAY_START=1000.
@@ -31,7 +31,6 @@ def train(agent, env, actions, optimizer,agent_eval):
   eval_reward = []
   eval_steps = 1000
   max_epoch = 100000
-  cumulative_reward
   for i in range(max_epoch):
     if training_steps < EPS_DECAY_START:
       epsilon = EPS_START
@@ -82,9 +81,10 @@ def train(agent, env, actions, optimizer,agent_eval):
           for i in range(eval_steps):
             agent_eval.policy.load_state_dict(agent.policy.state_dict())
             s1 = agent_eval.get_state()
-            action, reward = env.step(agent_eval)
+            action, reward = env_eval.step(agent_eval)
+            print action
             eval_reward.append(reward)  
-            print 'eval reward', reward
+            print 'eval reward', sum(eval_reward)
 
 
     training_steps += 1
@@ -95,7 +95,7 @@ def main():
   env_eval = Environment(config2)
   agent_eval = RLAgent(env_eval)
   optimizer = optim.SGD(agent.policy.parameters(), lr=.1)
-  train(agent, env, [0,1,2,3], optimizer,agent_eval)
+  train(agent, env, [0,1,2,3], optimizer, agent_eval, env_eval)
 
 if __name__ == '__main__':
   main()
