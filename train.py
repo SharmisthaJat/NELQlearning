@@ -16,7 +16,7 @@ import torchvision.transforms as T
 
 import numpy as np
 
-def train(agent, env, actions, optimizer, agent_eval, env_eval):
+def train(agent, env, actions, optimizer):
   EPS_START = 1.
   EPS_END = .1
   EPS_DECAY_START=1000.
@@ -31,9 +31,9 @@ def train(agent, env, actions, optimizer, agent_eval, env_eval):
   replay = deque(maxlen=10000)
   discount_factor = .9
   eval_reward = []
-  eval_steps = 10000
-  max_epoch = 100000000
-  for i in range(max_epoch):
+  eval_steps = 2000
+  max_steps = 1000000
+  for training_steps in range(max_steps):
     if training_steps < EPS_DECAY_START:
       epsilon = EPS_START
     elif training_steps > EPS_DECAY_END:
@@ -43,7 +43,7 @@ def train(agent, env, actions, optimizer, agent_eval, env_eval):
 
     add_to_replay = len(agent.prev_states) == 3
     s1 = agent.get_state()
-    action, reward = env.step(agent)
+    action, reward = agent.step(epsilon)
     s2 = agent.get_state()
     if add_to_replay:
       #replay.append((s1, action.value, reward, s2))  # enum issue in server machine
@@ -80,27 +80,31 @@ def train(agent, env, actions, optimizer, agent_eval, env_eval):
           print(loss.data[0])
 
         if training_steps % eval_frequency == 0:
+          agent_eval = RLAgent(env_eval)
+          env_eval = Environment(config2)
           agent_eval.policy.load_state_dict(agent.policy.state_dict())
           curr_reward = 0.0
           for i in range(eval_steps):            
             s1 = agent_eval.get_state()
-            action, reward = env_eval.step(agent_eval)
+            action, reward = agent_eval.step()
             curr_reward+=reward
           eval_reward.append(curr_reward)           
 
-    training_steps += 1
+    
 
   cPickle.dump(eval_reward,open('outputs/eval_reward.pkl','w'))
   plot_reward(eval_reward)
     
 
+# cumulative reward for training and test 
+
 def main():
   env = Environment(config2)
   agent = RLAgent(env)
-  env_eval = Environment(config2)
-  agent_eval = RLAgent(env_eval)
+  
+ 
   optimizer = optim.SGD(agent.policy.parameters(), lr=.1)
-  train(agent, env, [0,1,2,3], optimizer, agent_eval, env_eval)
+  train(agent, env, [0,1,2,3], optimizer)
 
 if __name__ == '__main__':
   main()
