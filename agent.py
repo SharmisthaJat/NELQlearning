@@ -36,8 +36,8 @@ class RLAgent(nel.Agent):
     # Should we have a function over the history?
     self.prev_states = deque(maxlen=history)
     self.history = history
-
-  def next_move(self):
+    
+  def next_move(self,epsilon=0.0):
     if(len(self.prev_states) < self.history):
       self.prev_states.append(self.create_current_frame())
       return actions[np.random.randint(0, len(actions))]
@@ -46,9 +46,12 @@ class RLAgent(nel.Agent):
     context = Variable(torch.from_numpy(state), requires_grad=False)
     self.prev_states.append(self.create_current_frame())
     qs = self.policy(context)
-    ind = np.argmax(qs.data.numpy())
+    policy_action_prob = qs.data.numpy()
+    random_action_prob = actions[np.random.randint(0, len(actions))]
+    action_prob = (epsilon*random_action_prob)+((1-epsilon)*policy_action_prob)
+    ind = np.argmax(action_prob)
     return actions[ind]
-    
+
   def create_current_frame(self):
     vis = self.vision().flatten()
     smell = self.scent()
@@ -61,11 +64,25 @@ class RLAgent(nel.Agent):
       context = np.array([])
     return np.concatenate([context, self.create_current_frame()])
 
+  def step(epsilon=0.0):
+    return self.env.step(epsilon)
+
   def save(self, filepath):
     pass
 
   def _load(self, filepath):
     pass
+
+class RandomAgent(nel.Agent):
+  def __init__(self, env, history=3, load_filepath=None):
+    super(RLAgent, self).__init__(env.simulator, load_filepath)
+    self.env = env
+  
+  def next_move(self):
+    return actions[np.random.randint(0, len(actions))]
+
+  def step():
+    return self.env.step()
 
 if __name__ == '__main__':
   from config import *

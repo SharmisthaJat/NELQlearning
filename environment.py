@@ -25,9 +25,9 @@ class Environment():
     assert cell != None,'Error: Agent visual field not observed'
     return cell
 
-  def step(self, agent):
+  def step(self,epsilon=0.0):
     steps=1
-    ag_move = agent.next_move()
+    ag_move = agent.next_move(epsilon)
     self.simulator.move(agent,ag_move,steps)
     curr_reward = self.reward(ag_move)
     self.prev_viz = agent.vision()
