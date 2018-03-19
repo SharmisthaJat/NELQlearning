@@ -1,9 +1,11 @@
 from agent import RLAgent
 from environment import Environment
 from config import config2
+from plot import plot_reward
 
 from collections import deque
 import random
+import cPickle
 
 import torch
 import torch.nn as nn
@@ -78,16 +80,19 @@ def train(agent, env, actions, optimizer, agent_eval, env_eval):
           print(loss.data[0])
 
         if training_steps % eval_frequency == 0:
-          for i in range(eval_steps):
-            agent_eval.policy.load_state_dict(agent.policy.state_dict())
+          agent_eval.policy.load_state_dict(agent.policy.state_dict())
+          curr_reward = 0.0
+          for i in range(eval_steps):            
             s1 = agent_eval.get_state()
             action, reward = env_eval.step(agent_eval)
-            print action
-            eval_reward.append(reward)  
-            print 'eval reward', sum(eval_reward)
-
+            curr_reward+=reward
+          eval_reward.append(curr_reward)           
 
     training_steps += 1
+
+  cPickle.dump(eval_reward,open('outputs/eval_reward.pkl','w'))
+  plot_reward(eval_reward)
+    
 
 def main():
   env = Environment(config2)
