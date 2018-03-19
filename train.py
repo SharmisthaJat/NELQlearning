@@ -80,8 +80,8 @@ def train(agent, env, actions, optimizer):
           print(loss.data[0])
 
         if training_steps % eval_frequency == 0:
-          agent_eval = RLAgent(env_eval)
           env_eval = Environment(config2)
+          agent_eval = RLAgent(env_eval)          
           agent_eval.policy.load_state_dict(agent.policy.state_dict())
           curr_reward = 0.0
           for i in range(eval_steps):            
