@@ -79,7 +79,7 @@ class RandomAgent(nel.Agent):
     self.env = env
   
   def next_move(self,epsilon=0.0):
-    return actions[np.random.randint(0, len(actions))]
+    return actions[np.random.choice(range(len(actions)),p=[0.5,0.1,0.2,0.2])]
 
   def step(self):
     return self.env.step(self)
