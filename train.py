@@ -112,7 +112,6 @@ def train(agent, env, actions, optimizer):
     painter.draw()
   print(cur_reward)
 
-    
 
 # cumulative reward for training and test 
 
