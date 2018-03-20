@@ -34,6 +34,8 @@ def train(agent, env, actions, optimizer):
   eval_reward = []
   eval_steps = 1000
   max_steps = 100001
+  tr_reward = 0
+  #painter_tr = nel.MapVisualizer(env.simulator, config2, (-30, -30), (150, 150))
   for training_steps in range(max_steps):
     if training_steps < EPS_DECAY_START:
       epsilon = EPS_START
@@ -42,10 +44,15 @@ def train(agent, env, actions, optimizer):
     else:
       epsilon = EPS_START - (EPS_START - EPS_END) * (training_steps - EPS_DECAY_START) / (EPS_DECAY_END - EPS_DECAY_START)
 
+    
     add_to_replay = len(agent.prev_states) == 3
     s1 = agent.get_state()
-    action, reward = agent.step(epsilon)
+    action, reward = agent.step(0.0)
+    #action, reward = agent.step(epsilon)
     s2 = agent.get_state()
+    tr_reward += reward
+    #painter_tr.draw()
+    #print(reward)
     if add_to_replay:
       replay.append((s1, action.value, reward, s2))  # enum issue in server machine
       #replay.append((s1, action, reward, s2))
@@ -69,14 +76,17 @@ def train(agent, env, actions, optimizer):
         reward = torch.FloatTensor(reward)
         y = Variable(reward + (discount_factor * q2))
 
-        #huber = nn.SmoothL1Loss()
-        mse = nn.MSELoss()
-        loss = mse(q1, y)
+        huber = nn.SmoothL1Loss()
+        #mse = nn.MSELoss()
+        loss = huber(q1, y)
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
         if training_steps % (update_frequency * 100) == 0:
+          print('step = ', training_steps)
           print("loss = ",loss.data[0])
+          print("train reward = ",tr_reward)
+          print('')
 
     if training_steps % target_update_frequency == 0:
       agent.target.load_state_dict(agent.policy.state_dict())
@@ -92,6 +102,7 @@ def train(agent, env, actions, optimizer):
         action, reward = agent_eval.step()
         curr_reward+=reward
         #painter.draw()
+      print('eval reward = ', curr_reward)
       eval_reward.append(curr_reward)           
 
     
@@ -101,14 +112,15 @@ def train(agent, env, actions, optimizer):
 
   env_eval = Environment(config2)
   agent_eval = RLAgent(env_eval)          
-  #painter = nel.MapVisualizer(env_eval.simulator, config2, (-30, -30), (150, 150))
+  painter = nel.MapVisualizer(env_eval.simulator, config2, (-30, -30), (150, 150))
   agent_eval.policy.load_state_dict(agent.policy.state_dict())
   cur_reward = 0
   for i in range(100):            
     s1 = agent_eval.get_state()
     action, reward = agent_eval.step()
+    print reward
     curr_reward+=reward
-    #`painter.draw()
+    painter.draw()
   print(cur_reward)
 
 

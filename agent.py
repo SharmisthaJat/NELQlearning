@@ -40,12 +40,14 @@ class RLAgent(nel.Agent):
   def next_move(self,epsilon=0.0):
     if(len(self.prev_states) < self.history):
       self.prev_states.append(self.create_current_frame())
-      return actions[np.random.randint(0, len(actions))]
+      #return actions[np.random.randint(0, len(actions))]
+      return np.random.choice(actions ,p=[0.5,0.1,0.2,0.2])
 
     random_prob = np.random.rand()
     if random_prob < epsilon:
       self.prev_states.append(self.create_current_frame())
-      return actions[np.random.randint(0, len(actions))]
+      return np.random.choice(actions ,p=[0.5,0.1,0.2,0.2])
+      #return actions[np.random.randint(0, len(actions))]
 
     state = self.get_state()
     context = Variable(torch.from_numpy(state), requires_grad=False)
@@ -81,7 +83,7 @@ class RandomAgent(nel.Agent):
     self.env = env
   
   def next_move(self,epsilon=0.0):
-    return actions[np.random.choice(range(len(actions)),p=[0.5,0.1,0.2,0.2])]
+    return np.random.choice(actions ,p=[0.5,0.1,0.2,0.2])
 
   def step(self):
     return self.env.step(self)
