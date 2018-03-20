@@ -12,16 +12,16 @@ class Environment():
   def reward(self, move):
     cell = None
     if move == nel.Direction.RIGHT:
-      cell = self.prev_viz[2,1,2]
+      cell = self.prev_viz[1,2,2]
 
     if move == nel.Direction.LEFT:
-      cell = self.prev_viz[2,1,0]
+      cell = self.prev_viz[1,0,2]
 
     if move == nel.Direction.UP:
-      cell = self.prev_viz[2,0,1]
+      cell = self.prev_viz[0,1,2]
 
     if move == nel.Direction.DOWN:
-      cell = self.prev_viz[2,2,1]
+      cell = self.prev_viz[2,1,2]
     assert cell != None,'Error: Agent visual field not observed'
     return cell
 
@@ -30,7 +30,12 @@ class Environment():
     ag_move = agent.next_move(epsilon)
     self.simulator.move(agent,ag_move,steps)
     curr_reward = self.reward(ag_move)
+    #print "BEFORE"
+    #print self.prev_viz
     self.prev_viz = agent.vision()
+    #print "AFTER"
+    #print self.prev_viz
+    #print '\n'
     return ag_move, curr_reward
 
 if(__name__=='__main__'): 
