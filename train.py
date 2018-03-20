@@ -2,6 +2,7 @@ from agent import RLAgent
 from environment import Environment
 from config import config2
 from plot import plot_reward
+import nel
 
 from collections import deque
 import random
@@ -32,7 +33,7 @@ def train(agent, env, actions, optimizer):
   discount_factor = .9
   eval_reward = []
   eval_steps = 2000
-  max_steps = 100000
+  max_steps = 100001
   for training_steps in range(max_steps):
     if training_steps < EPS_DECAY_START:
       epsilon = EPS_START
@@ -46,8 +47,8 @@ def train(agent, env, actions, optimizer):
     action, reward = agent.step(epsilon)
     s2 = agent.get_state()
     if add_to_replay:
-      #replay.append((s1, action.value, reward, s2))  # enum issue in server machine
-      replay.append((s1, action, reward, s2))
+      replay.append((s1, action.value, reward, s2))  # enum issue in server machine
+      #replay.append((s1, action, reward, s2))
 
     if training_steps % update_frequency == 0:
       if batch_size < len(replay):
@@ -74,26 +75,43 @@ def train(agent, env, actions, optimizer):
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
-
-        if training_steps % target_update_frequency == 0:
-          agent.target.load_state_dict(agent.policy.state_dict())
+        if training_steps % (update_frequency * 100) == 0:
           print(loss.data[0])
 
-        if training_steps % eval_frequency == 0:
-          env_eval = Environment(config2)
-          agent_eval = RLAgent(env_eval)          
-          agent_eval.policy.load_state_dict(agent.policy.state_dict())
-          curr_reward = 0.0
-          for i in range(eval_steps):            
-            s1 = agent_eval.get_state()
-            action, reward = agent_eval.step()
-            curr_reward+=reward
-          eval_reward.append(curr_reward)           
+    if training_steps % target_update_frequency == 0:
+      agent.target.load_state_dict(agent.policy.state_dict())
+
+    if training_steps % eval_frequency == 0:
+      env_eval = Environment(config2)
+      agent_eval = RLAgent(env_eval)          
+      #painter = nel.MapVisualizer(env_eval.simulator, config2, (-30, -30), (150, 150))
+      agent_eval.policy.load_state_dict(agent.policy.state_dict())
+      curr_reward = 0.0
+      for i in range(eval_steps):            
+        s1 = agent_eval.get_state()
+        action, reward = agent_eval.step()
+        curr_reward+=reward
+        #painter.draw()
+      eval_reward.append(curr_reward)           
 
     
-
   cPickle.dump(eval_reward,open('outputs/eval_reward.pkl','w'))
   plot_reward(eval_reward,'RL_agent_eval')
+  print(eval_reward[-1])
+
+  env_eval = Environment(config2)
+  agent_eval = RLAgent(env_eval)          
+  painter = nel.MapVisualizer(env_eval.simulator, config2, (-30, -30), (150, 150))
+  agent_eval.policy.load_state_dict(agent.policy.state_dict())
+  cur_reward = 0
+  for i in range(100):            
+    s1 = agent_eval.get_state()
+    action, reward = agent_eval.step()
+    print(reward)
+    curr_reward+=reward
+    painter.draw()
+  print(cur_reward)
+
     
 
 # cumulative reward for training and test 

@@ -42,14 +42,18 @@ class RLAgent(nel.Agent):
       self.prev_states.append(self.create_current_frame())
       return actions[np.random.randint(0, len(actions))]
 
+    random_prob = np.random.rand()
+    if random_prob < epsilon:
+      self.prev_states.append(self.create_current_frame())
+      return actions[np.random.randint(0, len(actions))]
+
+    print self.vision()
+    print self.prev_states[2] == self.prev_states[1]
     state = self.get_state()
     context = Variable(torch.from_numpy(state), requires_grad=False)
     self.prev_states.append(self.create_current_frame())
     qs = self.policy(context)
-    policy_action_prob = qs.data.numpy()
-    random_action_prob = actions[np.random.randint(0, len(actions))]
-    action_prob = (epsilon*random_action_prob)+((1-epsilon)*policy_action_prob)
-    ind = np.argmax(action_prob)
+    ind = np.argmax(qs.data.numpy())
     return actions[ind]
 
   def create_current_frame(self):
