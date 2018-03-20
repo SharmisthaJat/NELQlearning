@@ -47,8 +47,6 @@ class RLAgent(nel.Agent):
       self.prev_states.append(self.create_current_frame())
       return actions[np.random.randint(0, len(actions))]
 
-    print self.vision()
-    print self.prev_states[2] == self.prev_states[1]
     state = self.get_state()
     context = Variable(torch.from_numpy(state), requires_grad=False)
     self.prev_states.append(self.create_current_frame())

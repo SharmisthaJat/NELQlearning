@@ -7,5 +7,5 @@ def plot_reward(rewards,file_name):
 	plt.plot(rewards)
 	plt.ylabel('cumulative_reward')
 	plt.xlabel('time')
-	plt.show()
+	#plt.show()
 	fig.savefig("./outputs/"+file_name, bbox_inches='tight')

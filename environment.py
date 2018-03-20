@@ -8,13 +8,15 @@ class Environment():
   def __init__(self, config):
     self.simulator = nel.Simulator(sim_config=config)
     self.prev_viz = np.zeros((3,3,3))   
+    self.prev_jelly_count = 0.0
 
   def step(self, agent, epsilon=0.0):
     steps=1
     ag_move = agent.next_move(epsilon)
     self.simulator.move(agent,ag_move,steps)
-    curr_reward = agent.collected_items()
-    #print "BEFORE"
+    curr_reward = int(agent.collected_items()[2]) - self.prev_jelly_count
+    self.prev_jelly_count = int(agent.collected_items()[2])
+    #print "reward: ", curr_reward
     #print self.prev_viz
     self.prev_viz = agent.vision()
     #print "AFTER"
@@ -25,4 +27,4 @@ class Environment():
 if(__name__=='__main__'): 
   # test code
   e = Environment(config1)
-  print e.reward()
+  #print e.reward()

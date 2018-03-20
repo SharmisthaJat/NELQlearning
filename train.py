@@ -28,11 +28,11 @@ def train(agent, env, actions, optimizer):
   eval_frequency = 1000
   batch_size = 16
   training_steps = 0
-  epsilon = 1.
+  epsilon = 0.8
   replay = deque(maxlen=10000)
-  discount_factor = .9
+  discount_factor = .99
   eval_reward = []
-  eval_steps = 2000
+  eval_steps = 1000
   max_steps = 100001
   for training_steps in range(max_steps):
     if training_steps < EPS_DECAY_START:
@@ -76,7 +76,7 @@ def train(agent, env, actions, optimizer):
         loss.backward()
         optimizer.step()
         if training_steps % (update_frequency * 100) == 0:
-          print(loss.data[0])
+          print("loss = ",loss.data[0])
 
     if training_steps % target_update_frequency == 0:
       agent.target.load_state_dict(agent.policy.state_dict())
@@ -96,20 +96,19 @@ def train(agent, env, actions, optimizer):
 
     
   cPickle.dump(eval_reward,open('outputs/eval_reward.pkl','w'))
-  plot_reward(eval_reward,'RL_agent_eval')
-  print(eval_reward[-1])
+  #plot_reward(eval_reward,'RL_agent_eval')
+  print(eval_reward)
 
   env_eval = Environment(config2)
   agent_eval = RLAgent(env_eval)          
-  painter = nel.MapVisualizer(env_eval.simulator, config2, (-30, -30), (150, 150))
+  #painter = nel.MapVisualizer(env_eval.simulator, config2, (-30, -30), (150, 150))
   agent_eval.policy.load_state_dict(agent.policy.state_dict())
   cur_reward = 0
   for i in range(100):            
     s1 = agent_eval.get_state()
     action, reward = agent_eval.step()
-    print(reward)
     curr_reward+=reward
-    painter.draw()
+    #`painter.draw()
   print(cur_reward)
 
 
