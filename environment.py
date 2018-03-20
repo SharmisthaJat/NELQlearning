@@ -7,29 +7,13 @@ import numpy as np
 class Environment():
   def __init__(self, config):
     self.simulator = nel.Simulator(sim_config=config)
-    self.prev_viz = np.zeros((3,3,3)) 
-
-  def reward(self, move):
-    cell = None
-    if move == nel.Direction.RIGHT:
-      cell = self.prev_viz[1,2,2]
-
-    if move == nel.Direction.LEFT:
-      cell = self.prev_viz[1,0,2]
-
-    if move == nel.Direction.UP:
-      cell = self.prev_viz[0,1,2]
-
-    if move == nel.Direction.DOWN:
-      cell = self.prev_viz[2,1,2]
-    assert cell != None,'Error: Agent visual field not observed'
-    return cell
+    self.prev_viz = np.zeros((3,3,3))   
 
   def step(self, agent, epsilon=0.0):
     steps=1
     ag_move = agent.next_move(epsilon)
     self.simulator.move(agent,ag_move,steps)
-    curr_reward = self.reward(ag_move)
+    curr_reward = agent.collected_items()
     #print "BEFORE"
     #print self.prev_viz
     self.prev_viz = agent.vision()
