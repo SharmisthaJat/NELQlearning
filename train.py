@@ -7,6 +7,7 @@ import nel
 from collections import deque
 import random
 import cPickle
+import copy
 
 import torch
 import torch.nn as nn
@@ -28,12 +29,12 @@ def train(agent, env, actions, optimizer):
   eval_frequency = 1000
   batch_size = 64
   training_steps = 0
-  epsilon = 0.8
+  epsilon = 0.5 # 0.8
   replay = deque(maxlen=10000)
   discount_factor = .99
   eval_reward = []
   eval_steps = 1000
-  max_steps = 100001
+  max_steps = 10000
   tr_reward = 0
   #painter_tr = nel.MapVisualizer(env.simulator, config2, (-30, -30), (150, 150))
   prev_weights = agent.policy.fc3.weight
@@ -86,7 +87,7 @@ def train(agent, env, actions, optimizer):
         #agent.policy.fc2.weight.data -= .1 * agent.policy.fc2.weight.grad.data
         #agent.policy.fc1.weight.data -= .1 * agent.policy.fc1.weight.grad.data
         optimizer.step()
-        print (agent.policy.fc3.weight.data)
+        #print (agent.policy.fc3.weight.data)
         #prev_weights = agent.policy.fc3.weight.data
 
         if training_steps % (update_frequency * 100) == 0:
@@ -98,47 +99,55 @@ def train(agent, env, actions, optimizer):
     if training_steps % target_update_frequency == 0:
       agent.target.load_state_dict(agent.policy.state_dict())
 
-    if training_steps % 20000 == 0 and training_steps > 0:
-      env_eval = Environment(config2)
-      agent_eval = RLAgent(env_eval)          
-      painter = nel.MapVisualizer(env_eval.simulator, config2, (-30, -30), (150, 150))
-      agent_eval.policy.load_state_dict(agent.policy.state_dict())
-      for i in range(100):            
-        s1 = agent_eval.get_state()
-        action, reward = agent_eval.step()
-        painter.draw()
+    #if training_steps % 20000 == 0 and training_steps > 0:
+    #  env_eval = Environment(config2)
+    #  agent_eval = RLAgent(env_eval)          
+    #  painter = nel.MapVisualizer(env_eval.simulator, config2, (-30, -30), (150, 150))
+    #  state_dictionary = copy.deepcopy(agent.policy.state_dict())
+    #  agent_eval.policy.load_state_dict(state_dictionary)
+    #  #agent_eval.policy.load_state_dict(agent.policy.state_dict())
+    #  for i in range(100):            
+    #    s1 = agent_eval.get_state()
+    #    action, reward = agent_eval.step()
+    #    painter.draw()
 
-    if training_steps % eval_frequency == 0:
-      env_eval = Environment(config2)
-      agent_eval = RLAgent(env_eval)          
-      #painter = nel.MapVisualizer(env_eval.simulator, config2, (-30, -30), (150, 150))
-      agent_eval.policy.load_state_dict(agent.policy.state_dict())
-      curr_reward = 0.0
-      for i in range(eval_steps):            
-        s1 = agent_eval.get_state()
-        action, reward = agent_eval.step()
-        curr_reward+=reward
-        #painter.draw()
-      print('eval reward = ', curr_reward)
-      eval_reward.append(curr_reward)           
+    #if training_steps % eval_frequency == 0:
+    #  env_eval = Environment(config2)
+    #  agent_eval = RLAgent(env_eval)          
+    #  #painter = nel.MapVisualizer(env_eval.simulator, config2, (-30, -30), (150, 150))
+    #  state_dictionary = copy.deepcopy(agent.policy.state_dict())
+    #  agent_eval.policy.load_state_dict(state_dictionary)
+    #  curr_reward = 0.0
+    #  for i in range(eval_steps):            
+    #    s1 = agent_eval.get_state()
+    #    action, reward = agent_eval.step()
+    #    curr_reward+=reward
+    #    #painter.draw()
+    #  print('eval reward = ', curr_reward)
+    #  eval_reward.append(curr_reward)           
 
+  painter = nel.MapVisualizer(env.simulator, config2, (-30, -30), (150, 150))
+  for i in range(100):            
+    s1 = agent.get_state()
+    action, reward = agent.step()
+    painter.draw()
     
   cPickle.dump(eval_reward,open('outputs/eval_reward.pkl','w'))
   #plot_reward(eval_reward,'RL_agent_eval')
   print(eval_reward)
 
-  env_eval = Environment(config2)
-  agent_eval = RLAgent(env_eval)          
-  painter = nel.MapVisualizer(env_eval.simulator, config2, (-30, -30), (150, 150))
-  agent_eval.policy.load_state_dict(agent.policy.state_dict())
-  cur_reward = 0
-  for i in range(100):            
-    s1 = agent_eval.get_state()
-    action, reward = agent_eval.step()
-    print reward
-    curr_reward+=reward
-    painter.draw()
-  print(cur_reward)
+  #env_eval = Environment(config2)
+  #agent_eval = RLAgent(env_eval)          
+  #painter = nel.MapVisualizer(env_eval.simulator, config2, (-30, -30), (150, 150))
+  #agent_eval.policy.load_state_dict(agent.policy.state_dict())
+  #cur_reward = 0
+  #for i in range(100):            
+  #  s1 = agent_eval.get_state()
+  #  action, reward = agent_eval.step()
+  #  print reward
+  #  curr_reward+=reward
+  #  painter.draw()
+  #print(cur_reward)
 
 
 # cumulative reward for training and test 
@@ -148,7 +157,7 @@ def main():
   agent = RLAgent(env)
   
  
-  optimizer = optim.Adam(agent.policy.parameters(), lr=.1)
+  optimizer = optim.Adam(agent.policy.parameters(), lr=1.0)
   #print list(agent.policy.parameters())
   train(agent, env, [0,1,2,3], optimizer)
 
