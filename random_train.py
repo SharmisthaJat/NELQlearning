@@ -23,11 +23,11 @@ def train(agent, env, actions, optimizer):
   eval_reward=[]
   for training_steps in range(max_steps):
           curr_reward = 0.0
-          #painter = nel.MapVisualizer(env.simulator, config2, (-30, -30), (150, 150))
+          painter = nel.MapVisualizer(env.simulator, config2, (-30, -30), (150, 150))
           for i in range(eval_steps):            
             action, reward = agent.step()
             curr_reward+=reward
-            #painter.draw()
+            painter.draw()
           eval_reward.append(curr_reward)           
           
     

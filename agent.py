@@ -11,6 +11,7 @@ from torch.autograd import Variable
 from IPython import embed
 
 actions = [nel.Direction.UP, nel.Direction.DOWN, nel.Direction.LEFT, nel.Direction.RIGHT]
+torch.set_printoptions(precision=10)
 
 class Policy(nn.Module):
   def __init__(self, action_dim=len(actions), state_size=30, history=2, hidden_size=16):
@@ -30,6 +31,7 @@ class RLAgent(nel.Agent):
     self.env = env
     self.policy = Policy()
     self.target = Policy()
+    self.prev = torch.Tensor([0,0,0,0])
 
     for param in self.target.parameters():
       param.requires_grad = False
@@ -53,6 +55,11 @@ class RLAgent(nel.Agent):
     context = Variable(torch.from_numpy(state), requires_grad=False)
     self.prev_states.append(self.create_current_frame())
     qs = self.policy(context)
+    #print qs
+    #print state
+    #if torch.eq(qs.data, self.prev).all():
+    #  embed()
+    self.prev = qs.data
     ind = np.argmax(qs.data.numpy())
     return actions[ind]
 
