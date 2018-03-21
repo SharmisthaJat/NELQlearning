@@ -13,7 +13,7 @@ from IPython import embed
 actions = [nel.Direction.UP, nel.Direction.DOWN, nel.Direction.LEFT, nel.Direction.RIGHT]
 
 class Policy(nn.Module):
-  def __init__(self, action_dim=len(actions), state_size=30, history=4, hidden_size=64):
+  def __init__(self, action_dim=len(actions), state_size=30, history=2, hidden_size=16):
     super(Policy, self).__init__()
     self.fc1 = nn.Linear(state_size * history, hidden_size)
     self.fc2 = nn.Linear(hidden_size, hidden_size)
@@ -25,7 +25,7 @@ class Policy(nn.Module):
     return self.fc3(x)
 
 class RLAgent(nel.Agent):
-  def __init__(self, env, history=3, load_filepath=None):
+  def __init__(self, env, history=1, load_filepath=None):
     super(RLAgent, self).__init__(env.simulator, load_filepath)
     self.env = env
     self.policy = Policy()
