@@ -26,7 +26,7 @@ def train(agent, env, actions, optimizer):
   update_frequency = 4
   target_update_frequency = 1000
   eval_frequency = 1000
-  batch_size = 16
+  batch_size = 64
   training_steps = 0
   epsilon = 0.8
   replay = deque(maxlen=10000)
@@ -36,6 +36,7 @@ def train(agent, env, actions, optimizer):
   max_steps = 100001
   tr_reward = 0
   #painter_tr = nel.MapVisualizer(env.simulator, config2, (-30, -30), (150, 150))
+  prev_weights = agent.policy.fc3.weight
   for training_steps in range(max_steps):
     if training_steps < EPS_DECAY_START:
       epsilon = EPS_START
@@ -45,10 +46,10 @@ def train(agent, env, actions, optimizer):
       epsilon = EPS_START - (EPS_START - EPS_END) * (training_steps - EPS_DECAY_START) / (EPS_DECAY_END - EPS_DECAY_START)
 
     
-    add_to_replay = len(agent.prev_states) == 3
+    add_to_replay = len(agent.prev_states) == 1
     s1 = agent.get_state()
-    action, reward = agent.step(0.0)
-    #action, reward = agent.step(epsilon)
+    #action, reward = agent.step(0.0)
+    action, reward = agent.step(epsilon)
     s2 = agent.get_state()
     tr_reward += reward
     #painter_tr.draw()
@@ -76,12 +77,18 @@ def train(agent, env, actions, optimizer):
         reward = torch.FloatTensor(reward)
         y = Variable(reward + (discount_factor * q2))
 
-        huber = nn.SmoothL1Loss()
-        #mse = nn.MSELoss()
-        loss = huber(q1, y)
+        #huber = nn.SmoothL1Loss()
+        mse = nn.MSELoss()
+        loss = mse(q1, y)
         optimizer.zero_grad()
         loss.backward()
+        #agent.policy.fc3.weight.data -= .1 * agent.policy.fc3.weight.grad.data
+        #agent.policy.fc2.weight.data -= .1 * agent.policy.fc2.weight.grad.data
+        #agent.policy.fc1.weight.data -= .1 * agent.policy.fc1.weight.grad.data
         optimizer.step()
+        print (agent.policy.fc3.weight.data)
+        #prev_weights = agent.policy.fc3.weight.data
+
         if training_steps % (update_frequency * 100) == 0:
           print('step = ', training_steps)
           print("loss = ",loss.data[0])
@@ -90,6 +97,16 @@ def train(agent, env, actions, optimizer):
 
     if training_steps % target_update_frequency == 0:
       agent.target.load_state_dict(agent.policy.state_dict())
+
+    if training_steps % 20000 == 0 and training_steps > 0:
+      env_eval = Environment(config2)
+      agent_eval = RLAgent(env_eval)          
+      painter = nel.MapVisualizer(env_eval.simulator, config2, (-30, -30), (150, 150))
+      agent_eval.policy.load_state_dict(agent.policy.state_dict())
+      for i in range(100):            
+        s1 = agent_eval.get_state()
+        action, reward = agent_eval.step()
+        painter.draw()
 
     if training_steps % eval_frequency == 0:
       env_eval = Environment(config2)
@@ -131,7 +148,8 @@ def main():
   agent = RLAgent(env)
   
  
-  optimizer = optim.SGD(agent.policy.parameters(), lr=.1)
+  optimizer = optim.Adam(agent.policy.parameters(), lr=.1)
+  #print list(agent.policy.parameters())
   train(agent, env, [0,1,2,3], optimizer)
 
 if __name__ == '__main__':
