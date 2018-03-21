@@ -14,7 +14,6 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
 from torch.autograd import Variable
-import torchvision.transforms as T
 
 import numpy as np
 
@@ -126,7 +125,8 @@ def train(agent, env, actions, optimizer):
     #  print('eval reward = ', curr_reward)
     #  eval_reward.append(curr_reward)           
 
-  painter = nel.MapVisualizer(env.simulator, config2, (-30, -30), (150, 150))
+  position = agent.position()
+  painter = nel.MapVisualizer(env.simulator, config2, (position[0] - 70, position[1] - 70), (position[0] + 70, position[1] + 70))
   for i in range(100):            
     s1 = agent.get_state()
     action, reward = agent.step()
