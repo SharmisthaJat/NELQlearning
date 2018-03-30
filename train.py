@@ -114,11 +114,11 @@ def plot_setup():
 def plot(frame_idx, rewards, losses):
     # clear_output(True)
     fig = plt.figure(figsize=(20, 5))
-    plt.subplot(131)
+    plt.subplot(121)
     plt.title('frame %s. reward: %s' %
               (frame_idx, np.mean([rewards[i] for i in range(-10, 0)])))
     plt.plot(rewards)
-    plt.subplot(132)
+    plt.subplot(122)
     plt.title('loss')
     plt.plot(losses)
     plt.show()
