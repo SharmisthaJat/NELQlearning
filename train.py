@@ -53,7 +53,7 @@ def compute_td_loss(batch_size, agent, replay_buffer, gamma, optimizer):
     next_q_value = next_q_values.max(1)[0]
     expected_q_value = reward + gamma * next_q_value * (1 - done)
 
-    loss = (q_value - Variable(expected_q_value.data)).pow(2).mean()
+    loss = F.smooth_l1_loss(q_value,  Variable(expected_q_value.data))
 
     optimizer.zero_grad()
     loss.backward()
@@ -65,8 +65,8 @@ def compute_td_loss(batch_size, agent, replay_buffer, gamma, optimizer):
 def plot_setup():
     # plt.ion()
     fig = plt.figure()
-    ax1 = fig.add_subplot(131)
-    ax2 = fig.add_subplot(132)
+    ax1 = fig.add_subplot(121)
+    ax2 = fig.add_subplot(122)
     p1, = ax1.plot([])
     p2, = ax2.plot([])
     ax2.set_title('loss')
@@ -271,7 +271,11 @@ def train(agent, env, actions, optimizer):
         action, reward = agent.step()
         painter.draw()
 
-    cPickle.dump(eval_reward, open('outputs/eval_reward.pkl', 'w'))
+    with open('outputs/eval_reward.pkl', 'w') as f:
+        cPickle.dump(eval_reward, f)
+
+    with open("NELQ.model", 'w') as f:
+        torch.save(agent.policy, f)
     # plot_reward(eval_reward,'RL_agent_eval')
     print(eval_reward)
 
