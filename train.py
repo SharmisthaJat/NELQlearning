@@ -89,7 +89,11 @@ def plot_setup():
         ax2.set_yscale('log')
         plt.draw()
         plt.pause(0.0001)
-    return update
+
+    def save(fname):
+        fig.save_fig(fname)
+
+    return update, save
 # def plot_setup():
 #     fig = plt.figure(figsize=(20, 5))
 #     rewards = []
@@ -154,7 +158,7 @@ def train(agent, env, actions, optimizer):
     losses = []
     all_rewards = deque(maxlen=100)
     rewards = []
-    plt_fn = plot_setup()
+    plt_fn, save_fn = plot_setup()
     painter = None
     #painter_tr = nel.MapVisualizer(env.simulator, config2, (-30, -30), (150, 150))
     prev_weights = agent.policy.fc3.weight
@@ -266,7 +270,7 @@ def train(agent, env, actions, optimizer):
     position = agent.position()
     painter = nel.MapVisualizer(env.simulator, config2, (
         position[0] - 70, position[1] - 70), (position[0] + 70, position[1] + 70))
-    for i in range(100):
+    for _ in range(100):
         s1 = agent.get_state()
         action, reward = agent.step()
         painter.draw()
@@ -274,8 +278,12 @@ def train(agent, env, actions, optimizer):
     with open('outputs/eval_reward.pkl', 'w') as f:
         cPickle.dump(eval_reward, f)
 
+    with open('outputs/train_stats.pkl', 'w') as f:
+        cPickle.dump((losses, rewards), f)
+    
     with open("NELQ.model", 'w') as f:
         torch.save(agent.policy, f)
+    save_fn('outputs/NELQplot.png')
     # plot_reward(eval_reward,'RL_agent_eval')
     print(eval_reward)
 
