@@ -14,8 +14,15 @@ actions = [nel.Direction.UP, nel.Direction.DOWN, nel.Direction.LEFT, nel.Directi
 torch.set_printoptions(precision=10)
 
 class Policy(nn.Module):
-  def __init__(self, action_dim=len(actions), state_size=30, history=2, hidden_size=16):
+  def __init__(self, action_dim=len(actions), state_size=30, history=2, hidden_size=128):
     super(Policy, self).__init__()
+    # self.layers = nn.Sequential(
+    #     nn.Linear(state_size * history, hidden_size),
+    #     nn.ReLU(),
+    #     nn.Linear(hidden_size, hidden_size),
+    #     nn.ReLU(),
+    # )
+    
     self.fc1 = nn.Linear(state_size * history, hidden_size)
     self.fc2 = nn.Linear(hidden_size, hidden_size)
     self.fc3 = nn.Linear(hidden_size, action_dim)
@@ -31,6 +38,7 @@ class RLAgent(nel.Agent):
     self.env = env
     self.policy = Policy()
     self.target = Policy()
+    self.target.load_state_dict(self.policy.state_dict())
     self.prev = torch.Tensor([0,0,0,0])
 
     for param in self.target.parameters():
@@ -38,7 +46,10 @@ class RLAgent(nel.Agent):
     # Should we have a function over the history?
     self.prev_states = deque(maxlen=history)
     self.history = history
-    
+  
+  def update_target(self):
+      self.target.load_state_dict(self.policy.state_dict())
+      
   def next_move(self,epsilon=0.0):
     if(len(self.prev_states) < self.history):
       self.prev_states.append(self.create_current_frame())
