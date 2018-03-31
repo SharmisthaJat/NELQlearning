@@ -134,6 +134,13 @@ def get_epsilon(i, EPS_START, EPS_END, EPS_DECAY_START, EPS_DECAY_END):
                                                        EPS_DECAY_START) / (EPS_DECAY_END - EPS_DECAY_START)
     return epsilon
 
+def save_training_run(losses, rewards, agent, save_fn):
+    with open('outputs/train_stats.pkl', 'w') as f:
+        cPickle.dump((losses, rewards), f)
+    
+    with open("NELQ.model", 'w') as f:
+        torch.save(agent.policy, f)
+    save_fn('outputs/NELQplot.png')
 
 def train(agent, env, actions, optimizer):
     EPS_START = 1.
@@ -240,6 +247,9 @@ def train(agent, env, actions, optimizer):
 
         if training_steps % target_update_frequency == 0:
             agent.update_target()
+        
+        if training_steps % 50000 == 0:
+            save_training_run(losses, rewards, agent, save_fn)
         # if training_steps % 20000 == 0 and training_steps > 0:
         #  env_eval = Environment(config2)
         #  agent_eval = RLAgent(env_eval)
@@ -278,12 +288,7 @@ def train(agent, env, actions, optimizer):
     with open('outputs/eval_reward.pkl', 'w') as f:
         cPickle.dump(eval_reward, f)
 
-    with open('outputs/train_stats.pkl', 'w') as f:
-        cPickle.dump((losses, rewards), f)
-    
-    with open("NELQ.model", 'w') as f:
-        torch.save(agent.policy, f)
-    save_fn('outputs/NELQplot.png')
+    save_training_run(losses, rewards, agent, save_fn)
     # plot_reward(eval_reward,'RL_agent_eval')
     print(eval_reward)
 
