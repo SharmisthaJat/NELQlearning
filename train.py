@@ -91,7 +91,7 @@ def plot_setup():
         plt.pause(0.0001)
 
     def save(fname):
-        fig.save_fig(fname)
+        fig.savefig(fname)
 
     return update, save
 # def plot_setup():
@@ -134,13 +134,16 @@ def get_epsilon(i, EPS_START, EPS_END, EPS_DECAY_START, EPS_DECAY_END):
                                                        EPS_DECAY_START) / (EPS_DECAY_END - EPS_DECAY_START)
     return epsilon
 
-def save_training_run(losses, rewards, agent, save_fn):
+def save_training_run(losses, rewards, agent, save_fn, model_path, target_path, plot_path):
     with open('outputs/train_stats.pkl', 'w') as f:
         cPickle.dump((losses, rewards), f)
     
-    with open("NELQ.model", 'w') as f:
+    with open(target_path, 'w') as f:
+        torch.save(agent.target, f)    
+
+    with open(model_path, 'w') as f:
         torch.save(agent.policy, f)
-    save_fn('outputs/NELQplot.png')
+    save_fn(plot_path)
 
 def train(agent, env, actions, optimizer):
     EPS_START = 1.
@@ -159,7 +162,7 @@ def train(agent, env, actions, optimizer):
     discount_factor = .99
     eval_reward = []
     eval_steps = 1000
-    max_steps = 1000001
+    max_steps = 5000001
     tr_reward = 0
     agent.update_target()
     losses = []
@@ -206,7 +209,11 @@ def train(agent, env, actions, optimizer):
             print("loss = ", loss.data[0])
             print("train reward = ", tr_reward)
             print('')
-            plt_fn(training_steps, rewards, losses)
+            if training_steps < 100000:
+                plt_fn(training_steps, rewards, losses)
+            elif training_steps % 50000 == 0:
+                plt_fn(training_steps, rewards, losses)
+
 
         # if training_steps % 2000 == 0 and training_steps > 0:
         #     plot(training_steps, rewards, losses)
@@ -248,8 +255,12 @@ def train(agent, env, actions, optimizer):
         if training_steps % target_update_frequency == 0:
             agent.update_target()
         
+        m_path = 'outputs/models/NELQ_' + str(training_steps) + '.model'
+        t_path = 'outputs/models/NELQ_targ_' + str(training_steps) + '.model'
+        p_path = 'outputs/plots/NELQ_plot_' + str(training_steps) + '.png'
+
         if training_steps % 50000 == 0:
-            save_training_run(losses, rewards, agent, save_fn)
+            save_training_run(losses, rewards, agent, save_fn,m_path,t_path,p_path)
         # if training_steps % 20000 == 0 and training_steps > 0:
         #  env_eval = Environment(config2)
         #  agent_eval = RLAgent(env_eval)
@@ -288,7 +299,7 @@ def train(agent, env, actions, optimizer):
     with open('outputs/eval_reward.pkl', 'w') as f:
         cPickle.dump(eval_reward, f)
 
-    save_training_run(losses, rewards, agent, save_fn)
+    save_training_run(losses, rewards, agent, save_fn,m_path,t_path,p_path)
     # plot_reward(eval_reward,'RL_agent_eval')
     print(eval_reward)
 
