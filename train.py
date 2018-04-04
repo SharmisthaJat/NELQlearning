@@ -97,21 +97,6 @@ def plot_setup():
         fig.savefig(fname)
 
     return update, save
-# def plot_setup():
-#     fig = plt.figure(figsize=(20, 5))
-#     rewards = []
-#     losses = []
-#     ax1 = plt.subplot(131)
-#     p1 = ax1.plot(rewards)
-#     ax2 = plt.subplot(132)
-#     ax2.set_title('loss')
-#     p2 = ax2.plot(losses)
-#     def update(frame_idx, rewards, losses):
-#         p1[0].set_ydata(rewards)
-#         ax1.set_title('frame %s. reward: %s' % (frame_idx, np.mean(rewards[-10:])))
-#         p2[0].set_ydata(losses)
-#         plt.draw()
-#     return update
 
 
 def plot(frame_idx, rewards, losses):
@@ -196,18 +181,6 @@ def train(agent, env, actions, optimizer):
         all_rewards.append(reward)
         rewards.append(np.sum(all_rewards))
 
-        # painter_tr.draw()
-        # print(reward)
-
-        # if training_steps % 10000 < 100:
-        #     position = agent.position()
-        #     if painter is None:
-        #         painter = nel.MapVisualizer(env.simulator, config2, (
-        #             position[0] - 70, position[1] - 70), (position[0] + 70, position[1] + 70))
-        #     painter.draw()
-        # else:
-        #     painter = None
-
         # Add to memory current state, action it took, reward and new state.
         if add_to_replay:
             # enum issue in server machine
@@ -232,43 +205,6 @@ def train(agent, env, actions, optimizer):
                 plt_fn(training_steps, rewards, losses)
 
 
-        # if training_steps % 2000 == 0 and training_steps > 0:
-        #     plot(training_steps, rewards, losses)
-            # s1, action, reward, s2 = zip(*sample)
-            # s1 = np.array(s1)
-            # reward = np.array(reward)
-            # s2 = np.array(s2)
-            # action = np.array(action)
-            # s1 = Variable(torch.from_numpy(s1).float())
-            # q1 = agent.policy(s1)
-            # q1 = q1[torch.arange(0, action.size).long(),
-            #         torch.LongTensor(action)]
-
-            # s2 = Variable(torch.from_numpy(s2).float())
-            # q2 = agent.target(s2).data
-            # q2, _ = torch.max(q2, 1)
-
-            # reward = torch.FloatTensor(reward)
-            # y = Variable(reward + (discount_factor * q2))
-
-            # #huber = nn.SmoothL1Loss()
-            # mse = nn.MSELoss()
-            # loss = mse(q1, y)
-            # optimizer.zero_grad()
-            # loss.backward()
-            # #agent.policy.fc3.weight.data -= .1 * agent.policy.fc3.weight.grad.data
-            # #agent.policy.fc2.weight.data -= .1 * agent.policy.fc2.weight.grad.data
-            # #agent.policy.fc1.weight.data -= .1 * agent.policy.fc1.weight.grad.data
-            # optimizer.step()
-            #print (agent.policy.fc3.weight.data)
-            #prev_weights = agent.policy.fc3.weight.data
-
-            # if training_steps % (update_frequency * 100) == 0:
-            #     print('step = ', training_steps)
-            #     print("loss = ", loss.data[0])
-            #     print("train reward = ", tr_reward)
-            #     print('')
-
         if training_steps % target_update_frequency == 0:
             agent.update_target()
 
@@ -277,32 +213,6 @@ def train(agent, env, actions, optimizer):
 
         if training_steps % num_steps_save_training_run == 0:
             save_training_run(losses, rewards, agent, save_fn, model_path, p_path)
-        # if training_steps % 20000 == 0 and training_steps > 0:
-        #  env_eval = Environment(config2)
-        #  agent_eval = RLAgent(env_eval)
-        #  painter = nel.MapVisualizer(env_eval.simulator, config2, (-30, -30), (150, 150))
-        #  state_dictionary = copy.deepcopy(agent.policy.state_dict())
-        #  agent_eval.policy.load_state_dict(state_dictionary)
-        #  #agent_eval.policy.load_state_dict(agent.policy.state_dict())
-        #  for i in range(100):
-        #    s1 = agent_eval.get_state()
-        #    action, reward = agent_eval.step()
-        #    painter.draw()
-
-        # if training_steps % eval_frequency == 0:
-        #  env_eval = Environment(config2)
-        #  agent_eval = RLAgent(env_eval)
-        #  #painter = nel.MapVisualizer(env_eval.simulator, config2, (-30, -30), (150, 150))
-        #  state_dictionary = copy.deepcopy(agent.policy.state_dict())
-        #  agent_eval.policy.load_state_dict(state_dictionary)
-        #  curr_reward = 0.0
-        #  for i in range(eval_steps):
-        #    s1 = agent_eval.get_state()
-        #    action, reward = agent_eval.step()
-        #    curr_reward+=reward
-        #    #painter.draw()
-        #  print('eval reward = ', curr_reward)
-        #  eval_reward.append(curr_reward)
 
     position = agent.position()
     painter = nel.MapVisualizer(env.simulator, config2, (
@@ -316,21 +226,7 @@ def train(agent, env, actions, optimizer):
         cPickle.dump(eval_reward, f)
 
     save_training_run(losses, rewards, agent, save_fn, model_path, p_path)
-    # plot_reward(eval_reward,'RL_agent_eval')
     print(eval_reward)
-
-    #env_eval = Environment(config2)
-    #agent_eval = RLAgent(env_eval)
-    #painter = nel.MapVisualizer(env_eval.simulator, config2, (-30, -30), (150, 150))
-    # agent_eval.policy.load_state_dict(agent.policy.state_dict())
-    #cur_reward = 0
-    # for i in range(100):
-    #  s1 = agent_eval.get_state()
-    #  action, reward = agent_eval.step()
-    #  print reward
-    #  curr_reward+=reward
-    #  painter.draw()
-    # print(cur_reward)
 
 
 # cumulative reward for training and test
@@ -349,11 +245,9 @@ def main():
     from agent import actions
     state_size = (config2.vision_range*2 + 1)**2 * config2.color_num_dims + config2.scent_num_dims + len(actions)
     agent = RLAgent(env, state_size=state_size)
-        #history_len=agent_config['history_len'])
 
     optimizer = optim.Adam(agent.policy.parameters(),
         lr=agent_config['learning_rate'])
-    #print list(agent.policy.parameters())
 
     setup_output_dir()
     train(agent, env, [0, 1, 2, 3], optimizer)
