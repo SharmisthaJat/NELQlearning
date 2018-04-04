@@ -22,3 +22,7 @@ Note: The recommended way you should structure the interaction between the envir
 # Visualisation
 
 Youtube video [[paper](https://www.youtube.com/watch?time_continue=3&v=ARjEmqJNgVc)]
+
+# Presentation
+
+Class presentation [[link](https://docs.google.com/presentation/d/1sKSyohH7e7GUD1pb2_IIN1vnrG8tY-_Ml8qZLrlYAMk/edit?usp=sharing)]
