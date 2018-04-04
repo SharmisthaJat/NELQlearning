@@ -141,7 +141,7 @@ def train(agent, env, actions, optimizer):
     def eps_func(i):
         return get_epsilon(i, EPS_START, EPS_END, EPS_DECAY_START, EPS_DECAY_END)
     num_steps_save_training_run = 5000
-    update_frequency = 2
+    policy_update_frequency = train_config['policy_update_frequency']
     target_update_frequency = train_config['target_update_frequency']
     eval_frequency = train_config['eval_frequency']
     batch_size = train_config['batch_size']
@@ -187,7 +187,7 @@ def train(agent, env, actions, optimizer):
             replay.push(s1, action.value, reward, s2, False)
 
         # Update the network parameter every update_frequency steps.
-        if training_steps % update_frequency == 0:
+        if training_steps % policy_update_frequency == 0:
             if batch_size < len(replay):
                 # Compute loss and update parameters.
                 loss = compute_td_loss(

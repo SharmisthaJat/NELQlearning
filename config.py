@@ -66,4 +66,5 @@ train_config={
     'batch_size': 64
     'eval_frequency': 1000
     'target_update_frequency': 1000
+    'policy_update_frequency': 2
     }
