@@ -43,7 +43,7 @@ def main():
     env = Environment(config2)
     state_size = (config2.vision_range*2 + 1)**2 * config2.color_num_dims + config2.scent_num_dims
     agent = RLAgent(env, state_size=state_size)
-    agent._load("outputs/models/NELQ_30000")
+    agent._load("outputs/models/NELQ_110000")
     # ._load("NELQ.model")
 
     # optimizer = optim.Adam(agent.policy.parameters())

@@ -48,6 +48,7 @@ class RLAgent(nel.Agent):
         self.target = Policy(state_size=state_size) # history_len=history_len)
         self.target.load_state_dict(self.policy.state_dict())
         self.prev = torch.Tensor([0, 0, 0, 0])
+        self.prev_action = np.zeros(len(actions), dtype=np.float32)
 
         for param in self.target.parameters():
             param.requires_grad = False
@@ -90,7 +91,7 @@ class RLAgent(nel.Agent):
     def create_current_frame(self):
         vis = self.vision().flatten()
         smell = self.scent()
-        return np.concatenate([vis, smell])
+        return np.concatenate([vis, smell, self.prev_action])
 
     def get_state(self):
         if len(self.prev_states) > 0:
@@ -100,7 +101,10 @@ class RLAgent(nel.Agent):
         return np.concatenate([context, self.create_current_frame()])
 
     def step(self, epsilon=0.0):
-        return self.env.step(self, epsilon)
+        current_step = self.env.step(self, epsilon)
+        self.prev_action = np.zeros(len(actions), dtype=np.float32)
+        self.prev_action[current_step[0].value] = 1.0
+        return current_step
 
     def save(self, filepath):
         target_path = filepath+'.target'

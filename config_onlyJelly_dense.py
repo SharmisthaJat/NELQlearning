@@ -29,7 +29,7 @@ items.append(nel.Item("banana", [0.0, 1.0, 0.0], [0.0, 1.0, 0.0], False))
 items.append(nel.Item("onion", [1.0, 0.0, 0.0], [1.0, 0.0, 0.0], False))
 items.append(nel.Item("jellybean", [0.0, 0.0, 1.0], [0.0, 0.0, 1.0], True))
 
-intensity_fn_args = [-100, -100,  -0.5]  # Set the density of [banana, onion, jellybean]. They need to be negative. Closer to zero means more dense.
+intensity_fn_args = [-100, -100,  -2.3]  # Set the density of [banana, onion, jellybean]. They need to be negative. Closer to zero means more dense.
 interaction_fn_args = [len(items)]
 interaction_fn_args.extend([10.0, 200.0, 0.0, -6.0])  # parameters for interaction between item 0 and item 0
 interaction_fn_args.extend([200.0, 0.0, -6.0, -6.0])  # parameters for interaction between item 0 and item 1
@@ -39,7 +39,7 @@ interaction_fn_args.extend([0.0, 0.0, 0.0, 0.0])  # parameters for interaction b
 interaction_fn_args.extend([200.0, 0.0, -100.0, -100.0])  # parameters for interaction between item 1 and item 2
 interaction_fn_args.extend([10.0, 200.0, 2.0, -100.0])  # parameters for interaction between item 2 and item 0
 interaction_fn_args.extend([200.0, 0.0, -100.0, -100.0])  # parameters for interaction between item 2 and item 1
-interaction_fn_args.extend([10.0, 200.0, 0.0, -1.0])  # parameters for interaction between item 2 and item 2
+interaction_fn_args.extend([10.0, 200.0, 0.0, 0.0])  # parameters for interaction between item 2 and item 2
 
 config2 = nel.SimulatorConfig(
     max_steps_per_movement=1, vision_range=10,

@@ -336,7 +336,8 @@ def train(agent, env, actions, optimizer):
 
 def main():
     env = Environment(config2)
-    state_size = (config2.vision_range*2 + 1)**2 * config2.color_num_dims + config2.scent_num_dims
+    from agent import actions
+    state_size = (config2.vision_range*2 + 1)**2 * config2.color_num_dims + config2.scent_num_dims + len(actions)
     agent = RLAgent(env, state_size=state_size)
         #history_len=agent_config['history_len'])
 
