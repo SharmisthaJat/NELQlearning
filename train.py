@@ -17,6 +17,7 @@ from torch.autograd import Variable
 
 import numpy as np
 import matplotlib.pyplot as plt
+import os
 
 
 class ReplayBuffer(object):
@@ -334,6 +335,15 @@ def train(agent, env, actions, optimizer):
 
 # cumulative reward for training and test
 
+def setup_output_dir():
+    m_dir = 'outputs/models'
+    p_dir = 'outputs/plots'
+
+    if not os.path.exists(m_dir):
+        os.makedirs(m_dir)
+    if not os.path.exists(p_dir):
+        os.makedirs(p_dir)
+
 def main():
     env = Environment(config2)
     from agent import actions
@@ -344,6 +354,8 @@ def main():
     optimizer = optim.Adam(agent.policy.parameters(),
         lr=agent_config['learning_rate'])
     #print list(agent.policy.parameters())
+
+    setup_output_dir()
     train(agent, env, [0, 1, 2, 3], optimizer)
 
 
