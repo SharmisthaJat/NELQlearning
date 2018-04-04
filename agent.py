@@ -11,9 +11,6 @@ import torch.nn.functional as F
 from six.moves import cPickle
 from torch.autograd import Variable
 
-
-# from IPython import embed
-
 actions = [nel.Direction.UP, nel.Direction.DOWN, nel.Direction.LEFT,
            nel.Direction.RIGHT]
 torch.set_printoptions(precision=10)
@@ -23,13 +20,6 @@ class Policy(nn.Module):
     def __init__(self, state_size, action_dim=len(actions), history_len=2,
                  hidden_size=128):
         super(Policy, self).__init__()
-        # self.layers = nn.Sequential(
-        #     nn.Linear(state_size * history, hidden_size),
-        #     nn.ReLU(),
-        #     nn.Linear(hidden_size, hidden_size),
-        #     nn.ReLU(),
-        # )
-
         self.fc1 = nn.Linear(state_size * history_len, hidden_size)
         self.fc2 = nn.Linear(hidden_size, hidden_size)
         self.fc3 = nn.Linear(hidden_size, action_dim)
@@ -44,15 +34,14 @@ class RLAgent(nel.Agent):
     def __init__(self, env, state_size, history_len=1, load_filepath=None):
         super(RLAgent, self).__init__(env.simulator, load_filepath)
         self.env = env
-        self.policy = Policy(state_size=state_size) #history_len=history_len)
-        self.target = Policy(state_size=state_size) # history_len=history_len)
+        self.policy = Policy(state_size=state_size) 
+        self.target = Policy(state_size=state_size) 
         self.target.load_state_dict(self.policy.state_dict())
         self.prev = torch.Tensor([0, 0, 0, 0])
         self.prev_action = np.zeros(len(actions), dtype=np.float32)
 
         for param in self.target.parameters():
             param.requires_grad = False
-        # Should we have a function over the history?
         self.prev_states = deque(maxlen=history_len)
         self.history_len = history_len
 
@@ -83,17 +72,10 @@ class RLAgent(nel.Agent):
         context = Variable(torch.from_numpy(state), requires_grad=False)
         self.prev_states.append(self.create_current_frame())
         qs = self.policy(context)
-        # print qs
-        # print state
-        # if torch.eq(qs.data, self.prev).all():
-        #  embed()
         self.prev = qs.data
         # Pick the argmax.
         ind = np.argmax(qs.data.numpy())
         # Alternatively, you can sample proportional to qs.
-        # pval = qs.data.numpy()
-        # pvals = np.exp(pval) / np.sum(np.exp(pval), axis=0)
-        # ind = np.random.choice(np.arange(0, len(actions)), p=pvals)
         return actions[ind]
 
     def create_current_frame(self):
@@ -135,7 +117,7 @@ class RLAgent(nel.Agent):
 
 
 class RandomAgent(nel.Agent):
-    def __init__(self, env, history=3, load_filepath=None):
+    def __init__(self, env, load_filepath=None):
         super(RandomAgent, self).__init__(env.simulator, load_filepath)
         self.env = env
 

@@ -58,3 +58,7 @@ config2 = nel.SimulatorConfig(
 agent_config = {
     'history_len': 2,
     'learning_rate': 1e-4}
+
+train_config={
+    
+    }
