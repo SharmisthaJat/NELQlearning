@@ -152,5 +152,4 @@ if __name__ == '__main__':
     from config import *
 
     env0 = env.Environment(config1)
-    agent = RLAgent(env0)
-    embed()
+    agent = RLAgent(env0, 30)
