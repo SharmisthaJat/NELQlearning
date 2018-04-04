@@ -59,6 +59,9 @@ class RLAgent(nel.Agent):
     def update_target(self):
         self.target.load_state_dict(self.policy.state_dict())
 
+    def move_fn(self, epsilon):
+        return lambda epsilon=epsilon: self.next_move(epsilon=epsilon)
+
     def next_move(self, epsilon=0.05):
         # If the current sequence of states is less than the allowed min history
         # length, we randomly pick an action and add it to the history.
@@ -106,7 +109,7 @@ class RLAgent(nel.Agent):
         return np.concatenate([context, self.create_current_frame()])
 
     def step(self, epsilon=0.05):
-        current_step = self.env.step(self, epsilon)
+        current_step = self.env.step(self, self.move_fn(epsilon))
         self.prev_action = np.zeros(len(actions), dtype=np.float32)
         self.prev_action[current_step[0].value] = 1.0
         return current_step
@@ -136,11 +139,11 @@ class RandomAgent(nel.Agent):
         super(RandomAgent, self).__init__(env.simulator, load_filepath)
         self.env = env
 
-    def next_move(self, epsilon=0.0):
+    def next_move(self):
         return np.random.choice(actions, p=[0.5, 0.1, 0.2, 0.2])
 
     def step(self):
-        return self.env.step(self)
+        return self.env.step(self, self.next_move)
 
     def save(self, filepath):
         pass

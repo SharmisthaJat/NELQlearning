@@ -11,9 +11,9 @@ class Environment:
     self.prev_viz = np.zeros((3,3,3))   
     self.prev_jelly_count = 0.0
 
-  def step(self, agent, epsilon=0.0):
+  def step(self, agent, move_fn):
     steps = 1
-    ag_move = agent.next_move(epsilon)
+    ag_move = move_fn()
     self.simulator.move(agent, ag_move, steps)
     curr_reward = int(agent.collected_items()[2]) - self.prev_jelly_count
     self.prev_jelly_count = int(agent.collected_items()[2])
