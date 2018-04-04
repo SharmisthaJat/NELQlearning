@@ -1,6 +1,6 @@
 from agent import RLAgent
 from environment import Environment
-from config import config2, agent_config
+from config import config2, agent_config, train_config
 from plot import plot_reward
 import nel
 
@@ -142,15 +142,15 @@ def train(agent, env, actions, optimizer):
         return get_epsilon(i, EPS_START, EPS_END, EPS_DECAY_START, EPS_DECAY_END)
     num_steps_save_training_run = 5000
     update_frequency = 2
-    target_update_frequency = 1000
-    eval_frequency = 1000
-    batch_size = 64
+    target_update_frequency = train_config['target_update_frequency']
+    eval_frequency = train_config['eval_frequency']
+    batch_size = train_config['batch_size']
     training_steps = 0
     replay = ReplayBuffer(10000)
-    discount_factor = .99
+    discount_factor = train_config['discount_factor']
     eval_reward = []
-    eval_steps = 1000
-    max_steps = 5000001
+    eval_steps = train_config['eval_steps']
+    max_steps = train_config['max_steps']
     tr_reward = 0
     agent.update_target()
     losses = []
