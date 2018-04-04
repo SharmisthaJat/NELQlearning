@@ -33,7 +33,7 @@ def test(agent, env):
         (position[0] + 70, position[1] + 70))
     for _ in range(1000):
         s1 = agent.get_state()
-        action, reward = agent.step()
+        action, reward = agent.step(epsilon=0.1)
         print(reward)
         center_painter_on_agent(painter, agent)
         painter.draw()
@@ -43,7 +43,7 @@ def main():
     env = Environment(config2)
     state_size = (config2.vision_range*2 + 1)**2 * config2.color_num_dims + config2.scent_num_dims
     agent = RLAgent(env, state_size=state_size)
-    agent._load("outputs/models/NELQ_110000")
+    agent._load("outputs/models/NELQ_190000")
     # ._load("NELQ.model")
 
     # optimizer = optim.Adam(agent.policy.parameters())

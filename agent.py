@@ -59,20 +59,20 @@ class RLAgent(nel.Agent):
     def update_target(self):
         self.target.load_state_dict(self.policy.state_dict())
 
-    def next_move(self, epsilon=0.0):
+    def next_move(self, epsilon=0.05):
         # If the current sequence of states is less than the allowed min history
         # length, we randomly pick an action and add it to the history.
         if len(self.prev_states) < self.history_len:
             self.prev_states.append(self.create_current_frame())
             # return actions[np.random.randint(0, len(actions))]
-            return np.random.choice(actions, p=[0.5, 0.1, 0.2, 0.2])
+            return np.random.choice(actions) #p=[0.5, 0.1, 0.2, 0.2])
 
         # If we have a full history, with probability epsilon, we pick a random
         # action, in order to explore.
         random_prob = np.random.rand()
         if random_prob < epsilon:
             self.prev_states.append(self.create_current_frame())
-            return np.random.choice(actions, p=[0.5, 0.1, 0.2, 0.2])
+            return np.random.choice(actions) #p=[0.5, 0.1, 0.2, 0.2])
             # return actions[np.random.randint(0, len(actions))]
 
         # If we don't explore, then we chose the action with max Q value.
@@ -85,7 +85,12 @@ class RLAgent(nel.Agent):
         # if torch.eq(qs.data, self.prev).all():
         #  embed()
         self.prev = qs.data
+        # Pick the argmax.
         ind = np.argmax(qs.data.numpy())
+        # Alternatively, you can sample proportional to qs.
+        # pval = qs.data.numpy()
+        # pvals = np.exp(pval) / np.sum(np.exp(pval), axis=0)
+        # ind = np.random.choice(np.arange(0, len(actions)), p=pvals)
         return actions[ind]
 
     def create_current_frame(self):
@@ -100,7 +105,7 @@ class RLAgent(nel.Agent):
             context = np.array([])
         return np.concatenate([context, self.create_current_frame()])
 
-    def step(self, epsilon=0.0):
+    def step(self, epsilon=0.05):
         current_step = self.env.step(self, epsilon)
         self.prev_action = np.zeros(len(actions), dtype=np.float32)
         self.prev_action[current_step[0].value] = 1.0
