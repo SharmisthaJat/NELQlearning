@@ -106,10 +106,10 @@ class RLAgent(BaseAgent):
         return np.concatenate([context, self.create_current_frame()])
 
     def step(self, epsilon=0.05):
-        current_step = self.env.step(self, self.move_fn(epsilon))
+        current_step_and_reward = self.env.step(self, self.move_fn(epsilon))
         self.prev_action = np.zeros(len(actions), dtype=np.float32)
-        self.prev_action[current_step[0].value] = 1.0
-        return current_step
+        self.prev_action[current_step_and_reward[0].value] = 1.0
+        return current_step_and_reward
 
     def save(self, filepath):
         target_path = filepath+'.target'
