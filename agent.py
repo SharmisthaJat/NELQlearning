@@ -29,13 +29,28 @@ class Policy(nn.Module):
         x = F.tanh(self.fc2(x))
         return self.fc3(x)
 
-
-class RLAgent(nel.Agent):
-    def __init__(self, env, state_size, history_len=1, load_filepath=None):
-        super(RLAgent, self).__init__(env.simulator, load_filepath)
+class BaseAgent(nel.Agent):
+    def __init__(self, env, load_filepath=None):
+        super(BaseAgent, self).__init__(env.simulator, load_filepath)
         self.env = env
-        self.policy = Policy(state_size=state_size) 
-        self.target = Policy(state_size=state_size) 
+    
+    def save(self):
+        pass
+    
+    def _load(self):
+        pass
+
+    def next_move(self):
+        pass
+    
+    def step(self):
+        pass
+
+class RLAgent(BaseAgent):
+    def __init__(self, env, state_size, history_len=1, load_filepath=None):
+        super(RLAgent, self).__init__(env, load_filepath)
+        self.policy = Policy(state_size=state_size)
+        self.target = Policy(state_size=state_size)
         self.target.load_state_dict(self.policy.state_dict())
         self.prev = torch.Tensor([0, 0, 0, 0])
         self.prev_action = np.zeros(len(actions), dtype=np.float32)
@@ -116,10 +131,9 @@ class RLAgent(nel.Agent):
 
 
 
-class RandomAgent(nel.Agent):
+class RandomAgent(BaseAgent):
     def __init__(self, env, load_filepath=None):
-        super(RandomAgent, self).__init__(env.simulator, load_filepath)
-        self.env = env
+        super(RandomAgent, self).__init__(env, load_filepath)
 
     def next_move(self):
         return np.random.choice(actions, p=[0.5, 0.1, 0.2, 0.2])
