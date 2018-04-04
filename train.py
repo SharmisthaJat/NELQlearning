@@ -1,12 +1,12 @@
 from agent import RLAgent
 from environment import Environment
-from config import config2
+from config import config2, agent_config
 from plot import plot_reward
 import nel
 
 from collections import deque
 import random
-import cPickle
+from six.moves import cPickle
 import copy
 
 import torch
@@ -39,6 +39,7 @@ class ReplayBuffer(object):
 
 
 def compute_td_loss(batch_size, agent, replay_buffer, gamma, optimizer):
+    # Sample a random minibatch from the replay history.
     state, action, reward, next_state, done = replay_buffer.sample(batch_size)
 
     state = Variable(torch.FloatTensor(np.float32(state)))
@@ -48,12 +49,13 @@ def compute_td_loss(batch_size, agent, replay_buffer, gamma, optimizer):
     done = Variable(torch.FloatTensor(done))
 
     q_values = agent.policy(state)
-    next_q_values = agent.target(next_state)
+    q_values_target = agent.target(next_state)
     q_value = q_values.gather(1, action.unsqueeze(1)).squeeze(1)
-    next_q_value = next_q_values.max(1)[0]
+    next_q_value = q_values_target.max(1)[0]
     expected_q_value = reward + gamma * next_q_value * (1 - done)
 
-    loss = F.smooth_l1_loss(q_value,  Variable(expected_q_value.data))
+    # loss = F.smooth_l1_loss(q_value,  Variable(expected_q_value.data))
+    loss = F.mse_loss(q_value,  Variable(expected_q_value.data))
 
     optimizer.zero_grad()
     loss.backward()
@@ -134,16 +136,15 @@ def get_epsilon(i, EPS_START, EPS_END, EPS_DECAY_START, EPS_DECAY_END):
                                                        EPS_DECAY_START) / (EPS_DECAY_END - EPS_DECAY_START)
     return epsilon
 
-def save_training_run(losses, rewards, agent, save_fn, model_path, target_path, plot_path):
+
+def save_training_run(losses, rewards, agent, save_fn, model_path, plot_path):
     with open('outputs/train_stats.pkl', 'w') as f:
         cPickle.dump((losses, rewards), f)
-    
-    with open(target_path, 'w') as f:
-        torch.save(agent.target, f)    
 
-    with open(model_path, 'w') as f:
-        torch.save(agent.policy, f)
+    agent.save(filepath=model_path)
+
     save_fn(plot_path)
+
 
 def train(agent, env, actions, optimizer):
     EPS_START = 1.
@@ -151,8 +152,9 @@ def train(agent, env, actions, optimizer):
     EPS_DECAY_START = 1000.
     EPS_DECAY_END = 50000.
 
-    def eps_func(i): return get_epsilon(
-        i, EPS_START, EPS_END, EPS_DECAY_START, EPS_DECAY_END)
+    def eps_func(i):
+        return get_epsilon(i, EPS_START, EPS_END, EPS_DECAY_START, EPS_DECAY_END)
+    num_steps_save_training_run = 5000
     update_frequency = 2
     target_update_frequency = 1000
     eval_frequency = 1000
@@ -173,15 +175,26 @@ def train(agent, env, actions, optimizer):
     #painter_tr = nel.MapVisualizer(env.simulator, config2, (-30, -30), (150, 150))
     prev_weights = agent.policy.fc3.weight
     for training_steps in range(max_steps):
+        # Update current exploration parameter epsilon, which is discounted
+        # with time.
         epsilon = eps_func(training_steps)
-        add_to_replay = len(agent.prev_states) == 1
 
+        add_to_replay = len(agent.prev_states) >= 1
+
+        # Get current state.
         s1 = agent.get_state()
+
+        # Make a step.
         action, reward = agent.step(epsilon)
+
+        # Update state according to step.
         s2 = agent.get_state()
+
+        # Accumulate all rewards.
         tr_reward += reward
         all_rewards.append(reward)
         rewards.append(np.sum(all_rewards))
+
         # painter_tr.draw()
         # print(reward)
 
@@ -194,12 +207,15 @@ def train(agent, env, actions, optimizer):
         # else:
         #     painter = None
 
+        # Add to memory current state, action it took, reward and new state.
         if add_to_replay:
             # enum issue in server machine
             replay.push(s1, action.value, reward, s2, False)
 
+        # Update the network parameter every update_frequency steps.
         if training_steps % update_frequency == 0:
             if batch_size < len(replay):
+                # Compute loss and update parameters.
                 loss = compute_td_loss(
                     batch_size, agent, replay, discount_factor, optimizer)
                 losses.append(loss.data[0])
@@ -254,13 +270,12 @@ def train(agent, env, actions, optimizer):
 
         if training_steps % target_update_frequency == 0:
             agent.update_target()
-        
-        m_path = 'outputs/models/NELQ_' + str(training_steps) + '.model'
-        t_path = 'outputs/models/NELQ_targ_' + str(training_steps) + '.model'
+
+        model_path = 'outputs/models/NELQ_' + str(training_steps)
         p_path = 'outputs/plots/NELQ_plot_' + str(training_steps) + '.png'
 
-        if training_steps % 50000 == 0:
-            save_training_run(losses, rewards, agent, save_fn,m_path,t_path,p_path)
+        if training_steps % num_steps_save_training_run == 0:
+            save_training_run(losses, rewards, agent, save_fn, model_path, p_path)
         # if training_steps % 20000 == 0 and training_steps > 0:
         #  env_eval = Environment(config2)
         #  agent_eval = RLAgent(env_eval)
@@ -299,7 +314,7 @@ def train(agent, env, actions, optimizer):
     with open('outputs/eval_reward.pkl', 'w') as f:
         cPickle.dump(eval_reward, f)
 
-    save_training_run(losses, rewards, agent, save_fn,m_path,t_path,p_path)
+    save_training_run(losses, rewards, agent, save_fn, model_path, p_path)
     # plot_reward(eval_reward,'RL_agent_eval')
     print(eval_reward)
 
@@ -321,9 +336,12 @@ def train(agent, env, actions, optimizer):
 
 def main():
     env = Environment(config2)
-    agent = RLAgent(env)
+    state_size = (config2.vision_range*2 + 1)**2 * config2.color_num_dims + config2.scent_num_dims
+    agent = RLAgent(env, state_size=state_size)
+        #history_len=agent_config['history_len'])
 
-    optimizer = optim.Adam(agent.policy.parameters())
+    optimizer = optim.Adam(agent.policy.parameters(),
+        lr=agent_config['learning_rate'])
     #print list(agent.policy.parameters())
     train(agent, env, [0, 1, 2, 3], optimizer)
 

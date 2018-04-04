@@ -6,7 +6,7 @@ import nel
 
 from collections import deque
 import random
-import cPickle
+# import cPickle
 import copy
 
 import torch
@@ -19,25 +19,35 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def test(agent,env):
-	position = agent.position()
-	painter = nel.MapVisualizer(env.simulator, config2, (
-        position[0] - 70, position[1] - 70), (position[0] + 70, position[1] + 70))
-	for _ in range(1000):
-		s1 = agent.get_state()
-		action, reward = agent.step()
-		print(reward)
-		painter.draw()
+def center_painter_on_agent(painter, agent):
+    position = agent.position()
+    painter.set_viewbox(
+        (position[0] - 70, position[1] - 70),
+        (position[0] + 70, position[1] + 70))
+
+
+def test(agent, env):
+    position = agent.position()
+    painter = nel.MapVisualizer(env.simulator, config2,
+        (position[0] - 70, position[1] - 70),
+        (position[0] + 70, position[1] + 70))
+    for _ in range(1000):
+        s1 = agent.get_state()
+        action, reward = agent.step()
+        print(reward)
+        center_painter_on_agent(painter, agent)
+        painter.draw()
 
 
 def main():
     env = Environment(config2)
-    agent = RLAgent(env)
-    agent._load("outputs/models/NELQ_5000000.model")
-    #._load("NELQ.model")
+    state_size = (config2.vision_range*2 + 1)**2 * config2.color_num_dims + config2.scent_num_dims
+    agent = RLAgent(env, state_size=state_size)
+    agent._load("outputs/models/NELQ_30000")
+    # ._load("NELQ.model")
 
-    #optimizer = optim.Adam(agent.policy.parameters())
-    #print list(agent.policy.parameters())
+    # optimizer = optim.Adam(agent.policy.parameters())
+    # print list(agent.policy.parameters())
     test(agent, env)
 
 
