@@ -33,16 +33,16 @@ class BaseAgent(nel.Agent):
     def __init__(self, env, load_filepath=None):
         super(BaseAgent, self).__init__(env.simulator, load_filepath)
         self.env = env
-    
+
     def save(self):
         pass
-    
+
     def _load(self):
         pass
 
     def next_move(self):
         pass
-    
+
     def step(self):
         pass
 

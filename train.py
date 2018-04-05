@@ -73,7 +73,7 @@ def plot_setup():
     p1, = ax1.plot([])
     p2, = ax2.plot([])
     ax2.set_title('loss')
-    print "SETUP"
+    print("SETUP")
     fig.canvas.draw()
 
     def update(frame_idx, rewards, losses):
@@ -88,7 +88,7 @@ def plot_setup():
         ax1.set_ylim([min(rewards), max(rewards) + 10])
         ax2.set_xlim([0, len(losses)])
         ax2.set_ylim([min(losses), max(losses)])
-        print max(losses)
+        print(max(losses))
         ax2.set_yscale('log')
         plt.draw()
         plt.pause(0.0001)
@@ -124,7 +124,7 @@ def get_epsilon(i, EPS_START, EPS_END, EPS_DECAY_START, EPS_DECAY_END):
 
 
 def save_training_run(losses, rewards, agent, save_fn, model_path, plot_path):
-    with open('outputs/train_stats.pkl', 'w') as f:
+    with open('outputs/train_stats.pkl', 'wb') as f:
         cPickle.dump((losses, rewards), f)
 
     agent.save(filepath=model_path)
